@@ -1,3 +1,4 @@
+from discord import user
 import srcomapi, srcomapi.datatypes as dt, pandas as pd
 import plotly.graph_objects as pgo, plotly.io as pio
 from PIL import Image
@@ -70,8 +71,9 @@ class PortalPoints:
             placeCounter = 0
             #runPlace, runTime, playerName, runPoints
             while placeCounter < (len(self.portal_runs["Inbounds"][currentChamber].runs)):
+                currentRun = self.portal_runs["Inbounds"][currentChamber].runs[placeCounter]["run"].data
                 runPlace = (self.portal_runs["Inbounds"][currentChamber].runs[placeCounter]["place"]) #Gets Player Place
-                runTime = (self.portal_runs["Inbounds"][currentChamber].runs[placeCounter]["run"].times["primary_t"]) #Gets Player Time
+                runTime = currentRun["times"]["primary_t"] #Gets Player Time
                 playerName = ((self.portal_runs["Inbounds"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
                 runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
@@ -93,8 +95,9 @@ class PortalPoints:
             placeCounter = 0
             #runPlace, runTime, playerName, runPoints
             while placeCounter < (len(self.portal_runs["Out of Bounds"][currentChamber].runs)):
-                runPlace = (self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["place"]) #Gets Player Place
-                runTime = (self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["run"].times["primary_t"]) #Gets Player Time
+                currentRun = self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["run"].data
+                runPlace = (self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["place"])
+                runTime = currentRun["times"]["primary_t"] #Gets Player Time
                 playerName = ((self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
                 runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
@@ -116,8 +119,9 @@ class PortalPoints:
             placeCounter = 0
             #runPlace, runTime, playerName, runPoints
             while placeCounter < (len(self.portal_runs["Glitchless"][currentChamber].runs)):
-                runPlace = (self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["place"]) #Gets Player Place
-                runTime = (self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["run"].times["primary_t"]) #Gets Player Time
+                currentRun = self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["run"].data
+                runPlace = (self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["place"])
+                runTime = currentRun["times"]["primary_t"] #Gets Player Time
                 playerName = ((self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
                 runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
@@ -127,32 +131,6 @@ class PortalPoints:
                 placeCounter += 1
 
         return glessList
-
-    def createSpecificChamberList(self):
-        """Returns a 2D list of runs for a specific chamber of a specific category
-        List Format: CATEGORY, CHAMBER, PLAYER, PLACE, POINTS, TIME"""
-
-        customList = []
-        currentList = []
-
-        chosenCat = input("Enter a Category: ")
-        chosenChamber = input("Enter a Chamber[00-01, 08, e02, etc...]: ")
-        
-        placeCounter = 0
-
-        #runPlace, runTime, playerName, runPoints
-        while placeCounter < (len(self.portal_runs[chosenCat][chosenChamber].runs)):
-            runPlace = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["place"]) #Gets Player Place
-            runTime = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].times["primary_t"]) #Gets Player Time
-            playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
-            runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
-
-            currentList = [chosenCat, chosenChamber, playerName, runPlace, runPoints, runTime] #creates single run entry list
-
-            customList.append(currentList) #Adds that run to the full list
-            placeCounter += 1
-
-        return customList
 
     def createSpecificChamberListBetter(self, chosenCat, chosenChamber):
         """Returns a 2D list of runs for a specific chamber of a specific category using arguments
@@ -165,8 +143,9 @@ class PortalPoints:
 
         #runPlace, runTime, playerName, runPoints
         while placeCounter < (len(self.portal_runs[chosenCat][chosenChamber].runs)):
+            currentRun = self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].data
             runPlace = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["place"]) #Gets Player Place
-            runTime = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].times["primary_t"]) #Gets Player Time
+            runTime = currentRun["times"]["primary_t"] #Gets Player Time
             playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
             runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
@@ -188,13 +167,49 @@ class PortalPoints:
 
         #runPlace, runTime, playerName, runPoints
         while placeCounter < (len(self.portal_runs[chosenCat][chosenChamber].runs)):
+            currentRun = self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].data
             runPlace = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["place"]) #Gets Player Place
-            runTime = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].times["primary_t"]) #Gets Player Time
+            runTime = currentRun["times"]["primary_t"] #Gets Player Time
             playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
             #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Gets Run Ticks?
             runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
             currentList = [runPlace, playerName, runPoints, runTime] #creates single run entry list
+            
+            customList.append(currentList) #Adds that run to the full list
+            placeCounter += 1
+
+        return customList
+
+
+    def createSpecificChamberListMore(self, chosenCat, chosenChamber):
+        """Returns a 2D list of runs for a specific chamber of a specific category using arguments
+        List Format: CATEGORY, CHAMBER, PLAYER, PLACE, POINTS, TIME"""
+
+        customList = []
+        currentList = []
+        
+        placeCounter = 0
+        #runPlace, runTime, playerName, runPoints
+        while placeCounter < (len(self.portal_runs[chosenCat][chosenChamber].runs)):
+            currentRun = self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].data
+
+            runPlace = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["place"]) #Gets Player Place
+            runTime = currentRun["times"]["primary_t"] #Gets Player Time
+            playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
+            #playerName = currentRun["players"][0]["uri"] #Not Working Other Way of getting Player Name
+            #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Gets Run Ticks?
+            runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
+
+            try:
+                runVidLink = currentRun["videos"]["links"][0]["uri"]#[0]["uri"]
+            except:
+                runVidLink = "N/A"
+
+            runLink = currentRun["weblink"]
+            runDate = currentRun["date"]
+
+            currentList = [runPlace, playerName, runPoints, runTime, runLink, runVidLink, runDate] #creates single run entry list
             
             customList.append(currentList) #Adds that run to the full list
             placeCounter += 1
@@ -215,8 +230,9 @@ class PortalPoints:
                 playerName = ((self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
 
                 if(playerName == inputPlayerName):
-                    runPlace = (self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["place"]) #Gets Player Place
-                    runTime = (self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].times["primary_t"]) #Gets Player Time
+                    currentRun = self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].data
+                    runPlace = (self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["place"])#Gets Player Place
+                    runTime = currentRun["times"]["primary_t"] #Gets Player Time
                     runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
                 else:
                     placeCounter += 1
@@ -335,8 +351,6 @@ class PortalPoints:
 
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
         playerValues = df.loc[df['Player'] == player].values[0]
-        print("poopy")
-        print(f'Overall,{playerValues[2]},{playerValues[1]}')
         playerValues = (f'{playerValues[2]},{playerValues[1]}')
         return playerValues
 
@@ -349,234 +363,9 @@ class PortalPoints:
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
     
         playerValues = df.loc[df['Player'] == player].values[0]
-        print(f',{category},{playerValues[2]},{playerValues[1]}')
         playerValues = (f',{category},{playerValues[2]},{playerValues[1]}')
         return playerValues
         
-
-
-    #CSV file exports for leaderboards
-    def exportPointsLeaderboardCSV(inputLeaderboard, leaderboardFileName):
-        """Exports a CSV file containing a points leaderboard of all players for all ILs of one or all categories
-            Used in conjuction with either createAllCatPointsList or createSpecificCatPointsList"""
-
-        fullLeaderboard = ""
-
-        f = open(leaderboardFileName, "w", encoding="utf-8") #open
-
-        for user in inputLeaderboard:
-            currentLine = (str(user[0]) + "," + str(user[1]))
-            fullLeaderboard = fullLeaderboard + currentLine + "\n"
-
-        f.write(fullLeaderboard)
-
-        f.close #close
-
-    def exportPlayerProfileCSV(inputLeaderboard, leaderboardFileName):
-        """Exports a CSV file containing a profile of a single player for all ILs
-            Used in conjunction with either createProfileListAll or creatProfileListCategory"""
-
-        fullLeaderboard = ""
-        currentLine = ""
-
-        f = open(leaderboardFileName, "w", encoding="utf-8") #open
-
-        for user in inputLeaderboard:
-            currentLine = user[0] + "," + user[1] + "," + str(user[2]) + "," + str(user[3]) + "," + str(user[4])
-            fullLeaderboard = fullLeaderboard + currentLine + "\n"
-
-        f.write(fullLeaderboard)
-
-        f.close #close
-
-    def exportTheBigSheet(self, leaderboardFileName):
-        """Exports a formatted sheet of points leaderboard, level leaderboards, and player profiles"""
-        #Bolded, points, Multiple Bolded, level leaderboards, bolded, player profile
-
-        #Categories
-        catList = ["Inbounds", "Out of Bounds", "Glitchless"]
-        listOfPlayers = []
-        fullText = ""
-        allCatsPointsList = self.createAllCatPointsList()
-
-        f = open(leaderboardFileName, "w", encoding="utf-8") #open
-
-
-        #All Cats Points Board
-        fullText = "Points Board\n" + "Player,Total Points\n" 
-        for user in allCatsPointsList:
-            currentLine = (str(user[0]) + "," + str(user[1]))
-            fullText = fullText + currentLine + "\n"
-            listOfPlayers.append(user[0])
-
-        fullText = fullText + "\n\n" #Spacing New Line
-
-
-        #Individual Cat Points Boards
-        currentCategory = ""
-        for currentCategory in catList:
-            fullText += (currentCategory + " Points List\n")
-            fullText += " Player,Total Points\n"
-            currentCatPointsList = self.createSpecificCatPointsList(currentCategory)
-
-            for user in currentCatPointsList:
-                currentLine = (str(user[0]) + "," + str(user[1]))
-                fullText = fullText + currentLine + "\n"
-
-            fullText = fullText + "\n\n" #Spacing New Line
-
-
-        #Individual Chamber Boards
-        currentBoard = []
-        currentCategory = ""
-        for currentCategory in catList:
-            currentChamber = ""
-            for currentChamber in self.chamberList:
-                currentIndex = ""
-                currentBoard = self.createSpecificChamberListBetter(currentCategory, currentChamber)
-                for currentIndex in currentBoard:
-                    currentLine = (currentIndex[0] + "," + str(currentIndex[1]) + "," + currentIndex[2] + "," + str(currentIndex[3]) + "," + str(currentIndex[4]) + "," + str(currentIndex[5]) + "\n")
-                    fullText = fullText + currentLine
-                fullText = fullText + "\n"
-
-        
-        #Player Profiles
-        for player in listOfPlayers: #Loop Through All Players
-            fullText += (player + "'s Profile\n") #Player Name
-
-            for currentCategory in catList: #Loop Through all Categories for Player
-                currentPlayerCurrentCat = self.createProfileListCategory(player, currentCategory)
-                if len(currentPlayerCurrentCat) == 0:
-                    continue
-                fullText += (currentCategory + ",Chamber,Place,Points,Time\n") #Category List Name
-                
-
-                for user in currentPlayerCurrentCat: #Loop Through All ILs in Category
-                    currentLine = user[0] + "," + user[1] + "," + str(user[2]) + "," + str(user[3]) + "," + str(user[4])
-                    fullText = fullText + currentLine + "\n"
-            fullText += "\n" #Spacing Between Players New Line
-
-        f.write(fullText)
-
-        f.close #close
-
-    def exportSubSheets(self):
-        """Exports formatted sheets of points leaderboard, level leaderboards, and player profiles"""
-        #Bolded, points, Multiple Bolded, level leaderboards, bolded, player profile
-
-        #Categories
-        catList = ["Inbounds", "Out of Bounds", "Glitchless"]
-        listOfPlayers = []
-
-        #Text for assignment to csv files
-        fullText = ""
-        overText = ""
-        inbobText = ""
-        oobText = ""
-        glessText = ""
-        inbobLText = "Category,Level,Player,Place,Points,Time\n"
-        oobLText = "Category,Level,Player,Place,Points,Time\n"
-        glessLText = "Category,Level,Player,Place,Points,Time\n"
-        userText = ""
-
-        allCatsPointsList = self.createAllCatPointsList()
-
-        fOverall = open("OverallBoard.csv", "w", encoding="utf-8") #open
-        fInbounds = open("InboundsBoard.csv", "w", encoding="utf-8") #open
-        fInboundsLevels = open("InboundsLevelsBoard.csv", "w", encoding="utf-8") #open
-        fOOB = open("OOBBoard.csv", "w", encoding="utf-8") #open
-        fOOBLevels = open("OOBLevelsBoard.csv", "w", encoding="utf-8") #open
-        fGless = open("GlessBoard.csv", "w", encoding="utf-8") #open
-        fGlessLevels = open("GlessLevelsBoard.csv", "w", encoding="utf-8") #open
-        fUsers = open("Users.csv", "w", encoding="utf-8") #open
-        fUsersFormat = open("UsersFormat.csv", "w", encoding="utf-8") #open
-
-        #All Cats Points Board -> Sheet 1
-        fullText = "Player,Total Points\n" 
-        for user in allCatsPointsList:
-            currentLine = (str(user[0]) + "," + str(user[1]))
-            fullText = fullText + currentLine + "\n"
-            listOfPlayers.append(user[0])
-        overText = fullText
-        fullText = ""
-
-        #Individual Cat Points Boards -> Start of Sheets 2,3,4
-        currentCategory = ""
-        for currentCategory in catList:
-            fullText += " Player,Total Points\n"
-            currentCatPointsList = self.createSpecificCatPointsList(currentCategory)
-
-            for user in currentCatPointsList:
-                currentLine = (str(user[0]) + "," + str(user[1]))
-                fullText = fullText + currentLine + "\n"
-
-            if currentCategory == "Inbounds":
-                inbobText = fullText + "\n"
-            elif currentCategory == "Out of Bounds":
-                oobText = fullText + "\n"
-            else:
-                glessText = fullText + "\n"
-            fullText = "" 
-
-
-        #Individual Chamber Boards -> Sheets 2,3,4
-        currentBoard = []
-        currentCategory = ""
-        for currentCategory in catList:
-            currentChamber = ""
-            for currentChamber in self.chamberList:
-                currentIndex = ""
-                currentBoard = self.createSpecificChamberListBetter(currentCategory, currentChamber)
-                for currentIndex in currentBoard:
-                    currentLine = (currentIndex[0] + "," + str(currentIndex[1]) + "," + currentIndex[2] + "," + str(currentIndex[3]) + "," + str(currentIndex[4]) + "," + str(currentIndex[5]) + "\n")
-                    fullText = fullText + currentLine
-                fullText = fullText + "\n"
-
-            if currentCategory == "Inbounds":
-                inbobLText = inbobLText + fullText
-            elif currentCategory == "Out of Bounds":
-                oobLText = oobLText + fullText
-            else:
-                glessLText = glessLText + fullText
-            fullText = ""
-
-        
-        #Player Profiles -> Sheet 5
-        for player in listOfPlayers: #Loop Through All Players
-            #fullText += (player + "'s Profile\n") #Player Name
-
-            for currentCategory in catList: #Loop Through all Categories for Player
-                currentPlayerCurrentCat = self.createProfileListCategory(player, currentCategory)
-                if len(currentPlayerCurrentCat) == 0:
-                    continue
-                fullText += ("Player" + "," + currentCategory + ",Chamber,Place,Points,Time\n") #Category List Name
-                
-
-                for user in currentPlayerCurrentCat: #Loop Through All ILs in Category
-                    currentLine = player + "," + user[0] + "," + user[1] + "," + str(user[2]) + "," + str(user[3]) + "," + str(user[4])
-                    fullText = fullText + currentLine + "\n"
-            fullText += "\n" #Spacing Between Players New Line
-
-        userText = fullText
-
-        fOverall.write(overText)
-        fInbounds.write(inbobText)
-        fOOB.write(oobText)
-        fGless.write(glessText)
-        fUsers.write(userText)
-        fInboundsLevels.write(inbobLText)
-        fOOBLevels.write(oobLText)
-        fGlessLevels.write(glessLText)
-
-        fOverall.close #close
-        fInbounds.close #close
-        fOOB.close #close
-        fGless.close #close
-        fInboundsLevels.close #close
-        fOOBLevels.close #close
-        fGlessLevels.close #close
-        fUsers.close #close
-
 
     #Text Exports for Leaderboards
     def exportPointsLeaderboardText(self):
@@ -872,7 +661,6 @@ class PortalPoints:
             Used in conjuction with createProfileListAll
             Default Length of Leaderboard (10)
             Intended for use in the bot."""
-        print("other one")
         pio.kaleido.scope.default_height = 430 #Table Height
 
         allCatsPointsList = self.createProfileListCategory(player, category) 
@@ -882,7 +670,7 @@ class PortalPoints:
         df.Points = df.Points.round(decimals=2)
         df.Time = df.Time.round(decimals=3)
         df = df.nsmallest(10, 'Place')
-        print("imagine")
+        
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
             columnorder = [1,2,3,4,5],
@@ -902,12 +690,12 @@ class PortalPoints:
         listimg.save("list.png")
         return totalPoints
 
-
     def exportPlayerProfileCategoryAll(self, player, category):
-        """Saves an image containing a player's top 10 ILs of a single category
+        '''Saves an image containing a player's top 10 ILs of a single category
             Used in conjuction with createProfileListAll
             Default Length of Leaderboard (5)
-            Intended for use in the bot."""
+            Intended for use in the bot.'''
+
         allCatsPointsList = self.createProfileListCategory(player, category) 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
@@ -1064,21 +852,14 @@ class PortalPoints:
                 elif (userMessage[1].lower() == "inbounds" or userMessage[1].lower() == "inbob" or \
                         userMessage[1].lower() == "oob" or userMessage[1].lower() == "gless" or userMessage[1].lower() == "glitchless"):
                     try:
-                        catString = ""
+                        category = userMessage[1]
+                        category = self.inputToCategory(category)
+                        if(category == ''):
+                            return("catfail")
 
-                        if(userMessage[1].lower() == "inbob" or userMessage[1].lower() == "inbounds"): #Inbounds
-                            self.exportCatPointsLeaderboardImageDefault("Inbounds")
-                            catString = "Inbounds"
+                        self.exportCatPointsLeaderboardImageDefault(category)
 
-                        elif(userMessage[1].lower() == "oob"): #Out of Bounds
-                            self.exportCatPointsLeaderboardImageDefault("Out of Bounds")
-                            catString = "Out of Bounds"
-
-                        elif(userMessage[1].lower() == "gless" or userMessage[1].lower() == "glitchless"): #Glitchless
-                            self.exportCatPointsLeaderboardImageDefault("Glitchless")
-                            catString = "Glitchless"
-
-                        return f"Top {catString} Players"
+                        return f"Top {category} Players"
 
                     except:
                         print('SRC is prolly pooping its pants')
@@ -1089,33 +870,25 @@ class PortalPoints:
                         
         
         elif (len(userMessage) == 3): #Leaderboard [CATEGORY] [NUMBER] creates a specific category leaderboard of specific length
-            if ((userMessage[1].lower() == "inbounds" or userMessage[1].lower() == "inbob" or userMessage[1].lower() == "inbound" or \
-                    userMessage[1].lower() == "oob" or userMessage[1].lower() == "gless" or userMessage[1].lower() == "glitchless")\
-                    and int(userMessage[2]) > 0 and int(userMessage[2]) < 300 and userMessage[2].isnumeric()):
-                try:
-                    catString = ""
+            try:
+                category = userMessage[1]
+                category = self.inputToCategory(category)
 
-                    boardLength = int(userMessage[2])
-                    if(userMessage[1].lower() == "inbob" or userMessage[1].lower() == "inbounds"): #Inbounds
-                        self.exportCatPointsLeaderboardImage("Inbounds", boardLength)
-                        catString = "Inbounds"
+                userMessage[2].isnumeric()
+                if(category == ''):
+                    return("catfail")
 
-                    elif(userMessage[1].lower() == "oob"): #Out of Bounds
-                        self.exportCatPointsLeaderboardImage("Out of Bounds", boardLength)
-                        catString = "Out of Bounds"
+                elif(not(int(userMessage[2]) > 0 and int(userMessage[2]) < 300 and userMessage[2].isnumeric())):
+                    return("lengthfail")
 
-                    elif(userMessage[1].lower() == "gless" or userMessage[1].lower() == "glitchless"): #Glitchless
-                        self.exportCatPointsLeaderboardImage("Glitchless", boardLength)
-                        catString = "Glitchless"
+                boardLength = int(userMessage[2])
+                self.exportCatPointsLeaderboardImage(category, boardLength)
+                return f"Top {boardLength} {category} Players"
 
-                    return f"Top {boardLength} {catString} Players"
+            except:
+                print('SRC is prolly pooping its pants')
+                return "fail"
 
-                except:
-                    print('SRC is prolly pooping its pants')
-                    return "fail"
-
-            else:
-                return "modfail"
 
         else: #!Leaderboard
             try:
@@ -1130,130 +903,28 @@ class PortalPoints:
         '''Command used for the bot to make level leaderboards
         Includes required specification of category and chamber'''
 
-        validChamber = True
+        category = userMessage[1]
+        level = userMessage[2]
+        if(len(userMessage) == 4):
+            level = (userMessage[2] + userMessage[3]).replace(' ', '')
+        
+        category = self.inputToCategory(category)
+        level = self.inputToChamber(level)
 
-        if (len(userMessage) == 3 and userMessage[2].isnumeric()):
-            levelShort = userMessage[2].replace('/','')
-            levelShort = levelShort.replace('-','')
-            levelShort = levelShort.replace(' ','')
-            if (levelShort == '10'):
-                levelShort = self.chamberList[6] #10
-            else:
-                levelShort = levelShort.replace('0','')
-            if ('e' in levelShort):
-                if (levelShort == 'e'):
-                    levelShort = self.chamberList[15] #e00
-                elif (levelShort == 'e1'):
-                    levelShort = self.chamberList[16] #e01
-                elif (levelShort == 'e2'):
-                    levelShort = self.chamberList[17] #e02
-            else: 
-                if (levelShort == '' or levelShort == '1' or levelShort.lower() == "owo"):
-                    levelShort = self.chamberList[0] #00-01
-                elif (levelShort == '23' or levelShort == '2' or levelShort == '3'):
-                    levelShort = self.chamberList[1] #02-03
-                elif (levelShort == '45' or levelShort == '4' or levelShort == '5'):
-                    levelShort = self.chamberList[2] #04-05
-                elif(levelShort == '67' or levelShort == '6' or levelShort == '7'):
-                    levelShort = self.chamberList[3] #06-07
-                elif(levelShort == '8'):
-                    levelShort = self.chamberList[4] #08
-                elif (levelShort == '9'):
-                    levelShort = self.chamberList[5] #09
-                elif (levelShort == '1112' or levelShort == '11' or levelShort == '12'):
-                    levelShort = self.chamberList[7] #11-12
-                elif (levelShort == '13'):
-                    levelShort = self.chamberList[8] #13
-                elif (levelShort == '14'):
-                    levelShort = self.chamberList[9] #14
-                elif (levelShort == '15'):
-                    levelShort = self.chamberList[10] #15
-                elif (levelShort == '16'):
-                    levelShort = self.chamberList[11] #16
-                elif (levelShort == '17'):
-                    levelShort = self.chamberList[12] #17
-                elif (levelShort == '18'):
-                    levelShort = self.chamberList[13] #18
-                elif (levelShort == '19'):
-                    levelShort = self.chamberList[14] #19
-                elif(levelShort == '10'):
-                    pass
-                else:
-                    validChamber = False
-                    return "chamberfail"
-                
-                if(validChamber == True):
-                    try:
-                        if(userMessage[1].lower() == "inbob" or userMessage[1].lower() == "inbounds"): #Inbounds
-                            listTitle = "Inbounds " + str(levelShort)
-                            self.exportChamberPointsLeaderboardImage("Inbounds", levelShort)
-
-                        elif(userMessage[1].lower() == "oob"): #Out of Bounds
-                            listTitle = "Out of Bounds " + str(levelShort)
-                            self.exportChamberPointsLeaderboardImage("Out of Bounds", levelShort)
-
-                        elif(userMessage[1].lower() == "gless" or userMessage[1].lower() == "glitchless"): #Glitchless
-                            listTitle = "Glitchless " + str(levelShort)
-                            self.exportChamberPointsLeaderboardImage("Glitchless", levelShort)
-
-                        else:
-                            validChamber = False
-                            return "catfail"
-
-                        if(validChamber == True):
-                            return listTitle
-
-                    except:
-                        return "fail"
-
-        else:
-            levelShort = userMessage[2]
-
-            if(len(userMessage) == 4):
-                levelShort = str(userMessage[2]) + str(userMessage[3])
-            if('adv' in levelShort or 'advanced' in levelShort):
-                levelShort = levelShort.replace('anced', '')
-                if(levelShort == 'adv13'):
-                    levelShort = self.chamberList[18] #adv13
-                elif(levelShort == 'adv14'):
-                    levelShort = self.chamberList[19] #adv14
-                elif(levelShort == 'adv15'):
-                    levelShort = self.chamberList[20] #adv15
-                elif(levelShort == 'adv16'):
-                    levelShort = self.chamberList[21] #adv16
-                elif(levelShort == 'adv17'):
-                    levelShort = self.chamberList[22] #adv17
-                elif(levelShort == 'adv18'):
-                    levelShort = self.chamberList[23] #adv18
-                else:
-                    validChamber = False
-                    return("chamberfail")
-
-            if(validChamber == True):
-                    try:
-                        if(userMessage[1].lower() == "inbob" or userMessage[1].lower() == "inbounds"): #Inbounds
-                            listTitle = "Inbounds " + str(levelShort)
-                            self.exportChamberPointsLeaderboardImage("Inbounds", levelShort)
-
-                        elif(userMessage[1].lower() == "oob"): #Out of Bounds
-                            listTitle = "Out of Bounds " + str(levelShort)
-                            self.exportChamberPointsLeaderboardImage("Out of Bounds", levelShort)
-
-                        elif(userMessage[1].lower() == "gless" or userMessage[1].lower() == "glitchless"): #Glitchless
-                            listTitle = "Glitchless " + str(levelShort)
-                            self.exportChamberPointsLeaderboardImage("Glitchless", levelShort)
-
-                        else:
-                            validChamber = False
-                            return("catfail")
-
-                        if(validChamber == True):
-                            return listTitle
-
-                    except:
-                        print('SRC is prolly pooping its pants')
+        if(category == '' or level == ''):
+            if(category == ''):
+                return("catfail")
+            elif(level == ''):
+                return ("chamberfail")
             else:
                 return("fail")
+
+        try:
+            self.exportChamberPointsLeaderboardImage(category, level)
+            return(f"**{category} {level} Leaderboard:**")
+
+        except:
+            return("fail")
 
     def userprofileCommand(self, userMessage):
         '''Command used for the bot to make a user profile
@@ -1296,65 +967,169 @@ class PortalPoints:
         elif (len(userMessage) == 3):
             #!Profile [PLAYER] [CATEGORY]
             try:
-                
-                try:
-                    if(userMessage[2].lower() == "glitchless" or userMessage[2].lower() == "gless"):
-                        playerRanking = self.getPlayerRankingCategory(userMessage[1], "Glitchless")
-                        self.exportPlayerProfileCategory(userMessage[1], "Glitchless")
+                player = userMessage[1]
+                category = userMessage[2]
+                category = self.inputToCategory(category)
 
-                    elif(userMessage[2].lower() == "inbounds" or userMessage[2].lower() == "inbob"):
-                        playerRanking = self.getPlayerRankingCategory(userMessage[1], "Inbounds")
-                        self.exportPlayerProfileCategory(userMessage[1], "Inbounds")
+                if(category == ''):
+                    return("catfail")
 
-                    elif(userMessage[2].lower() == "oob"):
-                        playerRanking = self.getPlayerRankingCategory(userMessage[1], "Out of Bounds")
-                        self.exportPlayerProfileCategory(userMessage[1], "Out of Bounds")
-                    
-                    else:
-                        return 'catfail'
-
-                except:
-                    return 'missfail'
+                playerRanking = self.getPlayerRankingCategory(player, category)
+                self.exportPlayerProfileCategory(player, category)
 
                 return playerRanking
 
             except:
                 return 'srcfail'
-
 
         elif (len(userMessage) == 4):
             #!Profile [PLAYER] [CATEGORY] ALL
             try:
-                
-                try:
-                    if(userMessage[2].lower() == "glitchless" or userMessage[2].lower() == "gless"):
-                        playerRanking = self.getPlayerRankingCategory(userMessage[1], "Glitchless")
-                        self.exportPlayerProfileCategoryAll(userMessage[1], "Glitchless")
+                player = userMessage[1]
+                category = userMessage[2]
+                category = self.inputToCategory(category)
 
-                    elif(userMessage[2].lower() == "inbounds" or userMessage[2].lower() == "inbob"):
-                        playerRanking = self.getPlayerRankingCategory(userMessage[1], "Inbounds")
-                        self.exportPlayerProfileCategoryAll(userMessage[1], "Inbounds")
+                if(category == ''):
+                    return("catfail")
 
-                    elif(userMessage[2].lower() == "oob"):
-                        playerRanking = self.getPlayerRankingCategory(userMessage[1], "Out of Bounds")
-                        self.exportPlayerProfileCategoryAll(userMessage[1], "Out of Bounds")
-                    
-                    else:
-                        return 'catfail'
-
-                except:
-                    return 'missfail'
+                playerRanking = self.getPlayerRankingCategory(player, category)
+                self.exportPlayerProfileCategoryAll(player, category)
 
                 return playerRanking
 
             except:
                 return 'srcfail'
-
 
         else:
             #invalid length
             return 'fail'
 
+    def runCommand(self, userMessage):
+        '''Command used for the bot to return information on a run
+        !Run [PLAYER] [CATEGORY] [CHAMBER]'''
+
+        try:
+            player = userMessage[1]
+            category = userMessage[2]
+            level = userMessage[3]
+            if(len(userMessage) == 5):
+                level = (userMessage[3] + userMessage[4]).replace(' ', '')
+
+            category = self.inputToCategory(category)
+            level = self.inputToChamber(level)
+
+            if(category == '' or level == '' or player == ''):
+                return("fail")
+
+            catPointsList = self.createSpecificChamberListMore(category, level) 
+            
+            df = pd.DataFrame(catPointsList, columns = ['Place', 'Player', 'Points', 'Time', 'Link', 'Video', 'Date'])
+            df = df.sort_values('Points', ascending=False)
+            df = df.round(decimals=2)
+
+            runValues = (df.loc[df['Player'] == player].values)[0]
+            runPlace = runValues[0]
+            runPoints = runValues[2]
+            runTime = runValues[3]
+            runLink  = runValues[4]
+            runVid = runValues[5]
+            runDate  = runValues[6]
+            runValues = [player, category, level, runPlace, runPoints, runTime, runLink, runVid, runDate]
+            return(runValues)
+
+        except:
+            return "fail"
+
+
+    #Input Filtering
+
+    def inputToCategory(self, userCategory):
+        '''Takes input and converts it to correctly formatted category name'''
+        userCategory = userCategory.lower()
+
+        if(userCategory == "inbob" or userCategory == "inbounds"): #Inbounds
+            return ("Inbounds")
+
+        elif(userCategory == "oob"): #Out of Bounds
+            return ("Out of Bounds")
+
+        elif(userCategory == "gless" or userCategory == "glitchless"): #Glitchless
+            return ("Glitchless")
+
+        else:
+            return("")
+
+    def inputToChamber(self, userChamber):
+        '''Takes input and converts it to correctly formatted chamber name'''
+        userChamber = userChamber.replace('/','')
+        userChamber = userChamber.replace('-','')
+
+        if (userChamber == '10'):
+            return(self.chamberList[6]) #10
+        else:
+            userChamber = userChamber.replace('0','')
+
+        if('adv' in userChamber):
+            userChamber = userChamber.replace('anced', '')
+
+            if(userChamber == 'adv13'):
+                return(self.chamberList[18]) #adv13
+            elif(userChamber == 'adv14'):
+                return(self.chamberList[19]) #adv14
+            elif(userChamber == 'adv15'):
+                return(self.chamberList[20]) #adv15
+            elif(userChamber == 'adv16'):
+                return(self.chamberList[21]) #adv16
+            elif(userChamber == 'adv17'):
+                return(self.chamberList[22]) #adv17
+            elif(userChamber == 'adv18'):
+                return(self.chamberList[23]) #adv18
+            else:
+                return('')
+
+        elif ('e' in userChamber):
+            if (userChamber == 'e'):
+                return(self.chamberList[15]) #e00
+            elif (userChamber == 'e1'):
+                return(self.chamberList[16]) #e01
+            elif (userChamber == 'e2'):
+                return(self.chamberList[17]) #e02
+            else:
+                return('')
+
+        else: 
+            if (userChamber == '' or userChamber == '1' or userChamber.lower() == "owo"):
+                return(self.chamberList[0]) #00-01
+            elif (userChamber == '23' or userChamber == '2' or userChamber == '3'):
+                return(self.chamberList[1]) #02-03
+            elif (userChamber == '45' or userChamber == '4' or userChamber == '5'):
+                return(self.chamberList[2]) #04-05
+            elif(userChamber == '67' or userChamber == '6' or userChamber == '7'):
+                return(self.chamberList[3]) #06-07
+            elif(userChamber == '8'):
+               return(self.chamberList[4]) #08
+            elif (userChamber == '9'):
+                return(self.chamberList[5]) #09
+            elif (userChamber == '1112' or userChamber == '11' or userChamber == '12'):
+                return(self.chamberList[7]) #11-12
+            elif (userChamber == '13'):
+                return(self.chamberList[8]) #13
+            elif (userChamber == '14'):
+                return(self.chamberList[9]) #14
+            elif (userChamber == '15'):
+                return(self.chamberList[10]) #15
+            elif (userChamber == '16'):
+                return(self.chamberList[11]) #16
+            elif (userChamber == '17'):
+                return(self.chamberList[12]) #17
+            elif (userChamber == '18'):
+                return(self.chamberList[13]) #18
+            elif (userChamber == '19'):
+                return(self.chamberList[14]) #19
+            elif(userChamber == '10'):
+                pass
+            else:
+                return('')
 
     #Don't work rn
     def leaderboardArrowCommand(self, userMessage, currentHighestPlayer):

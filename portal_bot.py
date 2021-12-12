@@ -21,6 +21,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+
     #Default Hello Command
     if message.content.startswith('!hello'):
         await message.channel.send('Hello!')
@@ -101,6 +102,9 @@ async def on_message(message):
         elif (boardCreated == "modfail"): #Fail
             await message.channel.send('Invalid Leaderboard Modifier. !help lb')
 
+        elif (boardCreated == "catfail"): #Fail
+            await message.channel.send('Invalid Category.')
+
         else: #Fail
             await message.channel.send('Something went wrong')
             
@@ -110,9 +114,9 @@ async def on_message(message):
         message.content.startswith('!levelboard'):
 
         userMessage = message.content.split(" ")
-
         try:
             boardCreated = PP.levelboardCommand(userMessage)
+
         except:
             await message.channel.send('Invalid Leaderboard Command.')
         
@@ -190,6 +194,25 @@ async def on_message(message):
             await message.channel.send("Invalid Profile Command.")
 
 
+    if message.content.startswith('!Run') or message.content.startswith('!run'):
+        userMessage = message.content.split(" ")
+
+        if(len(userMessage) == 4 or len(userMessage) == 5):
+            runInfo = PP.runCommand(userMessage)
+            if(len(runInfo) == 9):
+                await message.channel.send(f"**{runInfo[0]}'s {runInfo[1]} {runInfo[2]} Run:**\n" + 
+                f"Place: **{runInfo[3]}** Points: **{runInfo[4]}** Time: **{runInfo[5]}** Date: **{runInfo[8]}**\n" +
+                f"Link to Run: {runInfo[6]}\nVideo: {runInfo[7]}")
+
+            elif(runInfo == "fail"):
+                await message.channel.send('Error Retrieving Submission.')
+
+            else:
+                await message.channel.send('Run May Not Exist.')
+
+        else:
+            await message.channel.send("Invalid Run Command")
+
 
     #Help Command
     if (message.content).lower() == ('!help'):
@@ -197,6 +220,7 @@ async def on_message(message):
         **Leaderboards: **!Leaderboard [*optional*] [*optional*] [*optional*]\n
         **Levelboards: **!Levelboard [*category*] [*level*]\n
         **User Profile: **!Profile [*player name*] [*optional*] [*optional*]\n
+        **Run: **!Run [*player name*] [*category*] [*level*]\n
         **For Help with Specific Commands Enter \"!help [command]\"** ex. \"!help *leaderboard*\"''')
     
 
@@ -215,16 +239,18 @@ async def on_message(message):
 
         elif (userMessage[1] == "levelboard") or (userMessage[1] == "lvlb"): #!Levelboard
             await message.channel.send('''**!Levelboard (or !lvlb) Can Be Used to Get an Image of a Particular Level's Point Leaderboard**\n
-        **\"!Levelboard [CATEGORY] [LEVEL]\"** | ex. \"!lvlb *inbounds 00/01*\": This returns an overall points leaderboard of the top 10 runners.''')
+        **\"!Levelboard [CATEGORY] [LEVEL]\"** | ex. \"!lvlb *inbounds 00/01*\": This returns the top 10 runs of a category.''')
 
-        elif (userMessage[1] == "profile"): #!Profile
+        elif (userMessage[1] == "profile") or (userMessage[1] == "pf"): #!Profile
             await message.channel.send('''**!Profile Can Be Used to Get Different Information or Lists for a Specific Runner**\n
         **\"!Profile\" (Default Command):** This returns a linked user's top 5 runs and total points. **NOT IMPLEMENTED**\n
         **\"!Profile [PLAYER]\"** | ex. \"!Profile *Shizzal*\": This returns the user's top 5 runs, overall place w/ total points, and place w/ points for each cat.\n
         **\"!Profile [PLAYER] [CATEGORY]\"** | ex. \"!Profile *Shizzal* *Inbounds*\": This returns the user's top 10 runs from the category, overall place in the cat and points.\n
-        **\"!Profile [PLAYER] [CATEGORY] All\"** | ex. \"!Profile *Shizzal* *Inbounds* All\": This returns all the user's runs from the category, overall place in the cat and points.\n
-        
-        **NOT CURRENTLY IMPLEMENTED**''')
+        **\"!Profile [PLAYER] [CATEGORY] All\"** | ex. \"!Profile *Shizzal* *Inbounds* All\": This returns all the user's runs from the category, overall place in the cat and points.\n''')
+
+        elif (userMessage[1] == "run"): #!Profile
+            await message.channel.send('''**!Run Can Be Used to Get a Specific IL Run for a Specific Runner**\n
+            **\"!Run [PLAYER] [CATEGORY] [CHAMBER]\":** This returns information on a user's run on a specific IL.\n''')
 
         else: #Incorrect Entry
             await message.channel.send(f"No Such Command \"!{userMessage[1]}\" Exists")
