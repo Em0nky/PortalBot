@@ -1,2 +1,2 @@
 # PortalBot
-Its a bot
+Its a bot which assigns points to individual level runs to incentivize runs.
