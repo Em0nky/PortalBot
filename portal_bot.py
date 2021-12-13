@@ -44,57 +44,8 @@ async def on_message(message):
         
         if (boardCreated.startswith("Top") or boardCreated.startswith("All")): #Success
             #List Image
-            await message.channel.send(boardCreated)
+            await message.channel.send(f"**{boardCreated}**")
             await message.channel.send(file=discord.File('list.png'))
-            '''
-            validPageList = False
-            if(len(userMessage) == 1 or (len(userMessage) == 2 and not(userMessage[1].isnumeric()))):
-                validPageList = True
-            
-            if (validPageList == True):
-                #Reaction Stuff
-                currentHighestPlayer = 20
-                catList = PP.createAllCatPointsList()
-                maxPlayers = len(catList)
-                reactionTimeout = 0
-                while(reactionTimeout == 0):
-                    await message.add_reaction("⬅️")
-                    await message.add_reaction("➡️")
-
-                    def check (reaction, user):
-                        return user == message.author and str(reaction.emoji) in ['⬅️','➡️']
-                    try:
-                        reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
-
-                        if(reaction.emoji == '⬅️' and currentHighestPlayer == 10):
-                            await message.channel.send('Cannot Go Below Top 10 Players.')
-
-                        elif(reaction.emoji == '⬅️' and currentHighestPlayer > 10):
-                            #Edit previous message w/ new image of previous 10 players
-                            await message.delete()
-                            boardCreated = PP.leaderboardArrowCommand(userMessage, currentHighestPlayer)
-                            await message.channel.send(file=discord.File('list.png'))
-                            currentHighestPlayer = currentHighestPlayer - 10
-
-                        elif(reaction.emoji == '➡️' and currentHighestPlayer > maxPlayers - 10):
-                            await message.channel.send('Cannot Go Past End of Leaderboard.')
-
-                        elif(reaction.emoji == '➡️' and currentHighestPlayer <= maxPlayers - 10):
-                            #Edit previous message w/ new image of next 10 players
-                            await message.delete()
-                            boardCreated = PP.leaderboardArrowCommand(userMessage, currentHighestPlayer)
-                            await message.channel.send(file=discord.File('list.png'))
-                            currentHighestPlayer = currentHighestPlayer + 10
-
-                    except asyncio.TimeoutError:
-                        reactionTimeout = 1
-                        for r in message.reactions:
-                            await message.clear_reaction(r)
-                    except:
-                        reactionTimeout = 1
-                        for r in message.reactions:
-                            await message.clear_reaction(r) '''
-
 
         elif (boardCreated == "lengthfail"): #Fail
             await message.channel.send('Invalid Leaderboard Length.')
@@ -173,7 +124,8 @@ async def on_message(message):
                 await message.channel.send(f"**{userMessage[1]}'s {profileCreated[1]} Profile:**\n{profileCreated[1]} Points: **{profileCreated[3]}**  **|**  {profileCreated[1]} Place: **{profileCreated[2]}**")
 
             elif(len(userMessage) == 4): #Category All
-                await message.channel.send(f"**All of {userMessage[1]}'s {profileCreated[1]} Runs:**\n{profileCreated[1]} Points: **{profileCreated[3]}**  **|**  {profileCreated[1]} Place: **{profileCreated[2]}**")
+                await message.channel.send(f"**All of {userMessage[1]}'s {profileCreated[1]} Runs:**\n{profileCreated[1]} Points: **{profileCreated[3]}**  **|**  {profileCreated[1]} Place: **{profileCreated[2]}**" +
+                f"\n**Top 10 Scores:**")
 
             await message.channel.send(file=discord.File('list.png'))
 
@@ -242,7 +194,7 @@ async def on_message(message):
         **\"!Levelboard [CATEGORY] [LEVEL]\"** | ex. \"!lvlb *inbounds 00/01*\": This returns the top 10 runs of a category.''')
 
         elif (userMessage[1] == "profile") or (userMessage[1] == "pf"): #!Profile
-            await message.channel.send('''**!Profile Can Be Used to Get Different Information or Lists for a Specific Runner**\n
+            await message.channel.send('''**!Profile (or !pf) Can Be Used to Get Different Information or Lists for a Specific Runner**\n
         **\"!Profile\" (Default Command):** This returns a linked user's top 5 runs and total points. **NOT IMPLEMENTED**\n
         **\"!Profile [PLAYER]\"** | ex. \"!Profile *Shizzal*\": This returns the user's top 5 runs, overall place w/ total points, and place w/ points for each cat.\n
         **\"!Profile [PLAYER] [CATEGORY]\"** | ex. \"!Profile *Shizzal* *Inbounds*\": This returns the user's top 10 runs from the category, overall place in the cat and points.\n
@@ -250,7 +202,7 @@ async def on_message(message):
 
         elif (userMessage[1] == "run"): #!Profile
             await message.channel.send('''**!Run Can Be Used to Get a Specific IL Run for a Specific Runner**\n
-            **\"!Run [PLAYER] [CATEGORY] [CHAMBER]\":** This returns information on a user's run on a specific IL.\n''')
+            **\"!Run [PLAYER] [CATEGORY] [CHAMBER]\"** | ex. !run *RealCreative oob 08*: This returns information on a user's run on a specific IL.\n''')
 
         else: #Incorrect Entry
             await message.channel.send(f"No Such Command \"!{userMessage[1]}\" Exists")

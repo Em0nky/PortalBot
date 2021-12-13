@@ -14,8 +14,8 @@ class PortalPoints:
 
     def __init__(self):
         """
-        Constructor, grabs api stuff and creates 
-        catList, chamberList, chamberListNoAdv, chamberListOnlyAdv, and fullLeaderboard
+        Constructor, Grabs API stuff and creates below lists:
+        catList, chamberList, chamberListNoAdv, and chamberListOnlyAdv
         
         """
         
@@ -24,7 +24,7 @@ class PortalPoints:
         while(apiSuccessGrab == False):
             try: 
                 apiSuccessGrab = True
-                #api stuff
+                #api stuff kinda scuffed
                 game = api.search(srcomapi.datatypes.Game, {"name": "Portal"})[0]
 
                 #Grabbing API stuff and assigning into portal runs dict
@@ -56,9 +56,6 @@ class PortalPoints:
         #Adv Chambers
         self.chamberListOnlyAdv = ["Adv 13", "Adv 14", "Adv 15", "Adv 16", "Adv 17", "Adv 18"]
 
-        #LeaderboardText?
-        self.fullLeaderboard = ""
-
     #List of runs creators
     def createInboundsList(self):
         """Returns a 2D list of every inbounds IL run
@@ -77,7 +74,7 @@ class PortalPoints:
                 playerName = ((self.portal_runs["Inbounds"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
                 runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
-                currentList = ["Inbounds", currentChamber, playerName, runPlace, runPoints, runTime] #creates single run entry list
+                currentList = ["Inbounds", currentChamber, playerName, runPlace, runPoints, runTime] #Creates single run entry list
 
                 inboundsList.append(currentList) #Adds that run to the full list
                 placeCounter += 1
@@ -101,7 +98,7 @@ class PortalPoints:
                 playerName = ((self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
                 runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
-                currentList = ["Out of Bounds", currentChamber, playerName, runPlace, runPoints, runTime] #creates single run entry list
+                currentList = ["Out of Bounds", currentChamber, playerName, runPlace, runPoints, runTime] #Creates single run entry list
 
                 oobList.append(currentList) #Adds that run to the full list
                 placeCounter += 1
@@ -125,7 +122,7 @@ class PortalPoints:
                 playerName = ((self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
                 runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
-                currentList = ["Glitchless", currentChamber, playerName, runPlace, runPoints, runTime] #creates single run entry list
+                currentList = ["Glitchless", currentChamber, playerName, runPlace, runPoints, runTime] #Creates single run entry list
 
                 glessList.append(currentList) #Adds that run to the full list
                 placeCounter += 1
@@ -149,7 +146,7 @@ class PortalPoints:
             playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
             runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
-            currentList = [chosenCat, chosenChamber, playerName, runPlace, runPoints, runTime] #creates single run entry list
+            currentList = [chosenCat, chosenChamber, playerName, runPlace, runPoints, runTime] #Creates single run entry list
 
             customList.append(currentList) #Adds that run to the full list
             placeCounter += 1
@@ -171,7 +168,7 @@ class PortalPoints:
             runPlace = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["place"]) #Gets Player Place
             runTime = currentRun["times"]["primary_t"] #Gets Player Time
             playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
-            #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Gets Run Ticks?
+            #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Supposed to get Run Ticks
             runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
             currentList = [runPlace, playerName, runPoints, runTime] #creates single run entry list
@@ -198,7 +195,7 @@ class PortalPoints:
             runTime = currentRun["times"]["primary_t"] #Gets Player Time
             playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
             #playerName = currentRun["players"][0]["uri"] #Not Working Other Way of getting Player Name
-            #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Gets Run Ticks?
+            #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Supposed to get ticks
             runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
             try:
@@ -367,26 +364,6 @@ class PortalPoints:
         return playerValues
         
 
-    #Text Exports for Leaderboards
-    def exportPointsLeaderboardText(self):
-        """Returns text containing a points leaderboard of all players for all ILs of one or all categories
-            Used in conjuction with either createAllCatPointsList or createSpecificCatPointsList
-            Intended for use in the bot."""
-
-        allCatsPointsList = self.createAllCatPointsList()
-
-        fullText = "Place    |     Player    |     Total Points\n" 
-        userCounter = 1
-        for user in allCatsPointsList:
-            userCounter + 1
-            currentLine = (userCounter + " " + str(user[0]) + "  " + str(user[1]))
-            fullText = fullText + currentLine + "\n"
-        if(len(fullText) > 2000):
-            fullText = fullText[0:1999]
-            fullText = fullText[0:fullText.rfind("\n")]
-        return fullText
-
-
     #Image Exports for Leaderboards
     def exportPointsLeaderboardImageDefault(self):
         """Saves an image containing a points leaderboard of all players for all ILs of one or all categories
@@ -394,16 +371,17 @@ class PortalPoints:
             Default Length of Leaderboard (10)
             Intended for use in the bot."""
 
+        pio.kaleido.scope.default_scale = 2.0
         pio.kaleido.scope.default_height = 430 #Table Height
 
+        #Dataframe Creation
         allCatsPointsList = self.createAllCatPointsList() 
         df = pd.DataFrame(allCatsPointsList, columns = ['Player', 'Points'])
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-
-        df = df.nsmallest(10, 'Ranking')
+        df = df.nsmallest(10, 'Ranking') #Only Top 10 Players
 
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
@@ -416,11 +394,11 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'))
         ])
-
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, 330))
+        listimg = listimg.crop((160, 200, 1240, 660))
         listimg.save("list.png")
 
     def exportPointsLeaderboardImage(self, boardLength):
@@ -430,24 +408,19 @@ class PortalPoints:
             Intended for use in the bot."""
 
         boardLength = int(boardLength)
-        heightMult = 43 * boardLength 
-        if (boardLength > 10):
-            heightMult = heightMult - ((boardLength - 10) * 19)
-        elif(boardLength < 6):
-            heightMult = heightMult + 150
-        elif(boardLength < 10):
-            heightMult = heightMult + 100
+        heightMult = (20 * boardLength) + 300 #Table Height
 
+        pio.kaleido.scope.default_scale = 2.0
         pio.kaleido.scope.default_height = heightMult
 
+        #Dataframe Creation
         allCatsPointsList = self.createAllCatPointsList()
         df = pd.DataFrame(allCatsPointsList, columns = ['Player', 'Points'])
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-
-        df = df.nsmallest(boardLength, 'Ranking')
+        df = df.nsmallest(boardLength, 'Ranking') #Top Number Players
 
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
@@ -460,11 +433,11 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'))
         ])
-
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, (heightMult-100)))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
 
     def exportPointsLeaderboardImageMax(self):
@@ -473,8 +446,9 @@ class PortalPoints:
             Max Length of Board
             Intended for use in the bot."""
 
-        pio.kaleido.scope.default_height = 3350
+        pio.kaleido.scope.default_scale = 2.0
 
+        #Dataframe Creation
         allCatsPointsList = self.createAllCatPointsList()
         df = pd.DataFrame(allCatsPointsList, columns = ['Player', 'Points'])
         df = df.sort_values('Points', ascending=False)
@@ -494,10 +468,14 @@ class PortalPoints:
                     align='left'))
         ])
 
+        boardLength = len(df)
+        heightMult = (20 * boardLength) + 300
+        pio.kaleido.scope.default_height = heightMult
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, 3000))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
 
     def exportCatPointsLeaderboardImageDefault(self, category):
@@ -506,16 +484,17 @@ class PortalPoints:
             Default Length of Leaderboard (10)
             Intended for use in the bot."""
 
+        pio.kaleido.scope.default_scale = 2.0
         pio.kaleido.scope.default_height = 430 #Table Height
 
+        #Dataframe Creation
         catPointsList = self.createSpecificCatPointsList(category) 
         df = pd.DataFrame(catPointsList, columns = ['Player', 'Points'])
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-
-        df = df.nsmallest(10, 'Ranking')
+        df = df.nsmallest(10, 'Ranking') #Only Top 10 Players
 
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
@@ -528,11 +507,11 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'))
         ])
-
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, 330))
+        listimg = listimg.crop((160, 200, 1240, 660))
         listimg.save("list.png")
 
     def exportCatPointsLeaderboardImage(self, category, boardLength):
@@ -542,24 +521,19 @@ class PortalPoints:
             Intended for use in the bot."""
 
         boardLength = int(boardLength)
-        heightMult = 43 * boardLength 
-        if (boardLength > 10):
-            heightMult = heightMult - ((boardLength - 10) * 19)
-        elif(boardLength < 6):
-            heightMult = heightMult + 150
-        elif(boardLength < 10):
-            heightMult = heightMult + 100
+        heightMult = (20 * boardLength) + 300 #Table Height
 
+        pio.kaleido.scope.default_scale = 2.0
         pio.kaleido.scope.default_height = heightMult
 
+        #Dataframe Creation
         catPointsList = self.createSpecificCatPointsList(category) 
         df = pd.DataFrame(catPointsList, columns = ['Player', 'Points'])
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-
-        df = df.nsmallest(boardLength, 'Ranking')
+        df = df.nsmallest(boardLength, 'Ranking') #Top Number Runners
 
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
@@ -572,11 +546,11 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'))
         ])
-
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, (heightMult-100)))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
 
     def exportChamberPointsLeaderboardImage(self, category, level):
@@ -585,20 +559,16 @@ class PortalPoints:
             Variable Length of Board
             Intended for use in the bot."""
 
+        #Dataframe Creation
         catPointsList = self.createSpecificChamberListBot(category, level) 
         df = pd.DataFrame(catPointsList, columns = ['Place', 'Player', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
         boardLength = len(df)
-        heightMult = 43 * boardLength 
-        if (boardLength > 10):
-            heightMult = heightMult - ((boardLength - 10) * 19)
-        elif(boardLength < 6):
-            heightMult = heightMult + 150
-        elif(boardLength < 10):
-            heightMult = heightMult + 100
+        heightMult = (20 * boardLength) + 300 #Table Height
 
+        pio.kaleido.scope.default_scale = 2.0
         pio.kaleido.scope.default_height = heightMult
 
         #Using plotly to generate table and subsequent image
@@ -614,11 +584,11 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'),)
         ])
-
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, (heightMult-100)))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
     
     def exportPlayerProfileDefault(self, player):
@@ -627,15 +597,16 @@ class PortalPoints:
             Default Length of Leaderboard (5)
             Intended for use in the bot."""
 
-        pio.kaleido.scope.default_height = 380 #Table Height
+        pio.kaleido.scope.default_scale = 2.0
 
+        #Dataframe Creation
         allCatsPointsList = self.createProfileListAll(player) 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
         totalPoints = int(df['Points'].sum())
         df.Points = df.Points.round(decimals=2)
 
-        df = df.nsmallest(5, 'Place')
+        df = df.nsmallest(5, 'Place') #Top 5 Runs
 
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
@@ -648,11 +619,14 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'))
         ])
-
+        boardLength = len(df)
+        heightMult = (20 * boardLength) + 300
+        pio.kaleido.scope.default_height = heightMult
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, 230))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
         return totalPoints
 
@@ -661,8 +635,11 @@ class PortalPoints:
             Used in conjuction with createProfileListAll
             Default Length of Leaderboard (10)
             Intended for use in the bot."""
+        
+        pio.kaleido.scope.default_scale = 2.0
         pio.kaleido.scope.default_height = 430 #Table Height
 
+        #Dataframe Creation
         allCatsPointsList = self.createProfileListCategory(player, category) 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
@@ -682,11 +659,14 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'))
         ])
-
+        boardLength = len(df)
+        heightMult = (20 * boardLength) + 300
+        pio.kaleido.scope.default_height = heightMult
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, 330))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
         return totalPoints
 
@@ -696,6 +676,7 @@ class PortalPoints:
             Default Length of Leaderboard (5)
             Intended for use in the bot.'''
 
+        #Dataframe Creation
         allCatsPointsList = self.createProfileListCategory(player, category) 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
@@ -703,16 +684,11 @@ class PortalPoints:
         df.Points = df.Points.round(decimals=2)
 
         boardLength = int(df.size / 5)
-        heightMult = 43 * boardLength
-        if (boardLength > 10):
-            heightMult = heightMult - ((boardLength - 10) * 19)
-        elif(boardLength < 6):
-            heightMult = heightMult + 150
-        elif(boardLength < 10):
-            heightMult = heightMult + 100
+        heightMult = (20 * boardLength) + 300
 
-        pio.kaleido.scope.default_height = heightMult
+        pio.kaleido.scope.default_height = heightMult #Table Height
 
+        #Sorts by Chamber Order
         advQuery = df.query('Chamber.str.startswith("Adv")')
         advQuery = advQuery.sort_values('Chamber')
         escQuery = df.query('Chamber.str.startswith("e")')
@@ -733,85 +709,14 @@ class PortalPoints:
                     fill_color='#96e4ff',
                     align='left'))
         ])
-
         fig.write_image("list.png")
 
+        #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, (heightMult-100)))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
         return totalPoints
 
-
-    #Don't work rn
-    def exportPointsLeaderboardImageArrow(self, currentHighestPlayer):
-        """Saves an image containing a points leaderboard of all players for all ILs of one or all categories
-            Used in conjuction with createAllCatPointsList
-            Default Length of Leaderboard (10)
-            Intended for use in the bot."""
-
-        pio.kaleido.scope.default_height = 430 #Table Height
-
-        allCatsPointsList = self.createAllCatPointsList() 
-        df = pd.DataFrame(allCatsPointsList, columns = ['Player', 'Points'])
-        df = df.sort_values('Points', ascending=False)
-        df = df.round(decimals=2)
-
-        df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-
-        df = df[df.Ranking <= currentHighestPlayer and df.Ranking >= currentHighestPlayer - 10]
-
-        #Using plotly to generate table and subsequent image
-        fig = pgo.Figure(data=[pgo.Table(
-            columnorder = [2,3,1],
-            columnwidth = [60, 40, 25],
-            header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
-                        align='left'),
-            cells=dict(values=[df.Player, df.Points, df.Ranking],
-                    fill_color='#96e4ff',
-                    align='left'))
-        ])
-
-        fig.write_image("list.png")
-
-        listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, 330))
-        listimg.save("list.png")
-
-    def exportCatPointsLeaderboardImageArrow(self, category, currentHighestPlayer):
-        """Saves an image containing a points leaderboard of all players for all ILs of one category
-            Used in conjuction with createSpecificCatPointsList
-            Default Length of Leaderboard (10)
-            Intended for use in the bot."""
-
-        pio.kaleido.scope.default_height = 430 #Table Height
-
-        catPointsList = self.createSpecificCatPointsList(category) 
-        df = pd.DataFrame(catPointsList, columns = ['Player', 'Points'])
-        df = df.sort_values('Points', ascending=False)
-        df = df.round(decimals=2)
-
-        df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-
-        df = df[df.Ranking <= currentHighestPlayer and df.Ranking >= currentHighestPlayer - 10]
-
-        #Using plotly to generate table and subsequent image
-        fig = pgo.Figure(data=[pgo.Table(
-            columnorder = [2,3,1],
-            columnwidth = [60, 40, 25],
-            header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
-                        align='left'),
-            cells=dict(values=[df.Player, df.Points, df.Ranking],
-                    fill_color='#96e4ff',
-                    align='left'))
-        ])
-
-        fig.write_image("list.png")
-
-        listimg = Image.open("list.png")
-        listimg = listimg.crop((80, 100, 620, 330))
-        listimg.save("list.png")
 
     #Commands
     def leaderboardCommand(self, userMessage):
@@ -827,7 +732,7 @@ class PortalPoints:
             if (userMessage[1].isnumeric()): #numeric leaderboard requests(i.e. 15, 100)
                 boardLength = int(userMessage[1])
 
-                if boardLength < 300 and boardLength > 1:
+                if boardLength < 300 and boardLength > 0:
                     try:
                         self.exportPointsLeaderboardImage(boardLength)
                         return f"Top {boardLength} Overall Players"
@@ -1042,7 +947,6 @@ class PortalPoints:
 
 
     #Input Filtering
-
     def inputToCategory(self, userCategory):
         '''Takes input and converts it to correctly formatted category name'''
         userCategory = userCategory.lower()
@@ -1131,37 +1035,4 @@ class PortalPoints:
             else:
                 return('')
 
-    #Don't work rn
-    def leaderboardArrowCommand(self, userMessage, currentHighestPlayer):
-        '''Command used for the bot to make overall points leaderboards after a reaction'''
-
-        boardLength = 10 #Default Leaderboard Length
-        
-        #!Leaderboard [CATEGORY] after a reaction
-        if (len(userMessage) == 2): 
-            try:
-                if(userMessage[1].lower() == "inbob" or userMessage[1].lower() == "inbounds"): #Inbounds
-                    self.exportCatPointsLeaderboardImageArrow("Inbounds", currentHighestPlayer)
-
-                elif(userMessage[1].lower() == "oob"): #Out of Bounds
-                    self.exportCatPointsLeaderboardImageArrow("Out of Bounds", currentHighestPlayer)
-
-                elif(userMessage[1].lower() == "gless" or userMessage[1].lower() == "glitchless"): #Glitchless
-                    self.exportCatPointsLeaderboardImageArrow("Glitchless", currentHighestPlayer)
-
-                return "success"
-
-            except:
-                print('SRC is prolly pooping its pants')
-                return "fail"                 
-
-        else: #!Leaderboard after a reaction
-            try:
-                #!Leaderboard creates default length (10) leaderboard
-                self.exportPointsLeaderboardImageArrow(currentHighestPlayer)
-                return "success"
-
-            except:
-                print('SRC is prolly pooping its pants')
-                return "fail"
-
+    
