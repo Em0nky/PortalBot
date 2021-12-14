@@ -169,7 +169,7 @@ async def on_message(message):
     #Help Command
     if (message.content).lower() == ('!help'):
         await message.channel.send('''**List of Commands for PortalBot:**\n
-        **Leaderboards: **!Leaderboard [*optional*] [*optional*] [*optional*]\n
+        **Leaderboards: **!Leaderboard [*optional*] [*optional*]\n
         **Levelboards: **!Levelboard [*category*] [*level*]\n
         **User Profile: **!Profile [*player name*] [*optional*] [*optional*]\n
         **Run: **!Run [*player name*] [*category*] [*level*]\n

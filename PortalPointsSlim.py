@@ -178,7 +178,6 @@ class PortalPoints:
 
         return customList
 
-
     def createSpecificChamberListMore(self, chosenCat, chosenChamber):
         """Returns a 2D list of runs for a specific chamber of a specific category using arguments
         List Format: CATEGORY, CHAMBER, PLAYER, PLACE, POINTS, TIME"""
@@ -225,8 +224,8 @@ class PortalPoints:
             #runPlace, runTime, playerName, runPoints
             while placeCounter < (len(self.portal_runs[inputCategory][currentChamber].runs)):
                 playerName = ((self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
-
-                if(playerName == inputPlayerName):
+                
+                if(playerName.lower() == inputPlayerName.lower()):
                     currentRun = self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].data
                     runPlace = (self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["place"])#Gets Player Place
                     runTime = currentRun["times"]["primary_t"] #Gets Player Time
@@ -341,25 +340,29 @@ class PortalPoints:
         return totalPoints
 
     def getPlayerRanking(self, player):
+        playerL = player.lower()
         allCatsPointsList = self.createAllCatPointsList()
         df = pd.DataFrame(allCatsPointsList, columns = ['Player', 'Points'])
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-        playerValues = df.loc[df['Player'] == player].values[0]
+        df['Player'] = df['Player'].str.lower()
+        playerValues = df.loc[df['Player'] == playerL].values[0]
         playerValues = (f'{playerValues[2]},{playerValues[1]}')
         return playerValues
 
     def getPlayerRankingCategory(self, player, category):
+        playerL = player.lower()
         catPointsList = self.createSpecificCatPointsList(category)
         df = pd.DataFrame(catPointsList, columns = ['Player', 'Points'])
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
         df['Ranking'] = range(1, len(df) + 1) #Adds Ranking Column
-    
-        playerValues = df.loc[df['Player'] == player].values[0]
+        df['Player'] = df['Player'].str.lower()
+
+        playerValues = df.loc[df['Player'] == playerL].values[0]
         playerValues = (f',{category},{playerValues[2]},{playerValues[1]}')
         return playerValues
         
@@ -861,7 +864,6 @@ class PortalPoints:
 
                 if (missingCats >= 3):
                     return("namefail")
-
                 self.exportPlayerProfileDefault(userMessage[1])
                 totalPoints = playerRanking
                 return (str(totalPoints) + str(catRanks))
@@ -931,6 +933,8 @@ class PortalPoints:
             df = pd.DataFrame(catPointsList, columns = ['Place', 'Player', 'Points', 'Time', 'Link', 'Video', 'Date'])
             df = df.sort_values('Points', ascending=False)
             df = df.round(decimals=2)
+            df['Player'] = df['Player'].str.lower()
+
 
             runValues = (df.loc[df['Player'] == player].values)[0]
             runPlace = runValues[0]
