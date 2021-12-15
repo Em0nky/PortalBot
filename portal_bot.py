@@ -44,8 +44,10 @@ async def on_message(message):
         
         if (boardCreated.startswith("Top") or boardCreated.startswith("All")): #Success
             #List Image
-            await message.channel.send(f"**{boardCreated}**")
-            await message.channel.send(file=discord.File('list.png'))
+            file = discord.File("list.png")
+            embed = discord.Embed(description=f"**{boardCreated}**")
+            embed.set_image(url="attachment://list.png")
+            await message.channel.send(embed=embed, file=file)
 
         elif (boardCreated == "lengthfail"): #Fail
             await message.channel.send('Invalid Leaderboard Length.')
@@ -57,7 +59,7 @@ async def on_message(message):
             await message.channel.send('Invalid Category.')
 
         else: #Fail
-            await message.channel.send('Something went wrong')
+            await message.channel.send('Something Went Wrong (Likely the SRC API)')
             
 
     #Chamber Points Leaderboard Commands
@@ -72,8 +74,10 @@ async def on_message(message):
             await message.channel.send('Invalid Leaderboard Command.')
         
         if ("Glitchless" in boardCreated or "Out of Bounds" in boardCreated or "Inbounds" in boardCreated): #Success
-            await message.channel.send(boardCreated)
-            await message.channel.send(file=discord.File('list.png'))
+            file = discord.File("list.png")
+            embed = discord.Embed(description=f"**{boardCreated}**")
+            embed.set_image(url="attachment://list.png")
+            await message.channel.send(embed=embed, file=file)
 
         elif (boardCreated == "chamberfail"): #Fail
             await message.channel.send('Invalid Chamber. !help lb')
@@ -85,6 +89,7 @@ async def on_message(message):
             await message.channel.send('Invalid Command.')
 
 
+    #Profile Commands
     if message.content.startswith('!profile') or message.content.startswith('!pf') or\
         message.content.startswith('!Profile') or message.content.startswith('!Pf'):
 
@@ -95,39 +100,14 @@ async def on_message(message):
         except:
             await message.channel.send('Invalid Profile Command.')
         
-        
-
         if (len(profileCreated) > 8):
+
             profileCreated = profileCreated.split(",")
-            if(len(userMessage) == 2): #Default
 
-                if (len(profileCreated) == 5):
-                    await message.channel.send(f"**{userMessage[1]}'s Profile:**\nOverall Points: **{profileCreated[1]}**  **|**  {profileCreated[2]} Points: **{profileCreated[4]}** " +
-                    f"\nOverall Place: **{profileCreated[0]}**  **|**  {profileCreated[2]} Place: **{profileCreated[3]}**" +
-                    f"\n**Top 5 Scores:**")
-
-                elif(len(profileCreated) == 8):
-                    await message.channel.send(f"**{userMessage[1]}'s Profile:**\nOverall Points: **{profileCreated[1]}**  **|**  {profileCreated[2]} Points: **{profileCreated[4]}**  **|**  " + 
-                    f"{profileCreated[5]} Points: **{profileCreated[7]}** " + 
-                    f"\nOverall Place: **{profileCreated[0]}**  **|**  {profileCreated[2]} Place: **{profileCreated[3]}**  **|** {profileCreated[5]} Place: **{profileCreated[6]}**" +
-                    f"\n**Top 5 Scores:**")
-
-                elif(len(profileCreated) == 11):
-                    await message.channel.send(f"**{userMessage[1]}'s Profile:**\nOverall Points: **{profileCreated[1]}**  **|**  {profileCreated[2]} Points: **{profileCreated[4]}**  **|**  " + 
-                    f"\n{profileCreated[5]} Points: **{profileCreated[7]}**  **|**  {profileCreated[8]} Points: **{profileCreated[10]}** " + 
-                    f"\nOverall Place: **{profileCreated[0]}**  **|**  {profileCreated[2]} Place: **{profileCreated[3]}**   \n{profileCreated[5]} Place: **{profileCreated[6]}**  **|**  " + 
-                    f"{profileCreated[8]} Place: **{profileCreated[9]}**" +
-                    f"\n**Top 5 Scores:**")
-
-
-            elif(len(userMessage) == 3): #Category
-                await message.channel.send(f"**{userMessage[1]}'s {profileCreated[1]} Profile:**\n{profileCreated[1]} Points: **{profileCreated[3]}**  **|**  {profileCreated[1]} Place: **{profileCreated[2]}**")
-
-            elif(len(userMessage) == 4): #Category All
-                await message.channel.send(f"**All of {userMessage[1]}'s {profileCreated[1]} Runs:**\n{profileCreated[1]} Points: **{profileCreated[3]}**  **|**  {profileCreated[1]} Place: **{profileCreated[2]}**" +
-                f"\n**Top 10 Scores:**")
-
-            await message.channel.send(file=discord.File('list.png'))
+            file = discord.File("list.png")
+            embed = embedProfile(userMessage, profileCreated)
+            embed.set_image(url="attachment://list.png")
+            await message.channel.send(embed=embed, file=file)
 
         elif (profileCreated == 'namefail'):
             await message.channel.send(f'No Player named \"{userMessage[1]}\" has IL Runs or Doesn\'t Exist')
@@ -146,15 +126,15 @@ async def on_message(message):
             await message.channel.send("Invalid Profile Command.")
 
 
+    #Run Command
     if message.content.startswith('!Run') or message.content.startswith('!run'):
         userMessage = message.content.split(" ")
 
         if(len(userMessage) == 4 or len(userMessage) == 5):
             runInfo = PP.runCommand(userMessage)
             if(len(runInfo) == 9):
-                await message.channel.send(f"**{runInfo[0]}'s {runInfo[1]} {runInfo[2]} Run:**\n" + 
-                f"Place: **{runInfo[3]}** Points: **{runInfo[4]}** Time: **{runInfo[5]}** Date: **{runInfo[8]}**\n" +
-                f"Link to Run: {runInfo[6]}\nVideo: {runInfo[7]}")
+                embed = embedRun(runInfo)
+                await message.channel.send(embed=embed)
 
             elif(runInfo == "fail"):
                 await message.channel.send('Error Retrieving Submission.')
@@ -168,12 +148,13 @@ async def on_message(message):
 
     #Help Command
     if (message.content).lower() == ('!help'):
-        await message.channel.send('''**List of Commands for PortalBot:**\n
-        **Leaderboards: **!Leaderboard [*optional*] [*optional*]\n
-        **Levelboards: **!Levelboard [*category*] [*level*]\n
-        **User Profile: **!Profile [*player name*] [*optional*] [*optional*]\n
-        **Run: **!Run [*player name*] [*category*] [*level*]\n
-        **For Help with Specific Commands Enter \"!help [command]\"** ex. \"!help *leaderboard*\"''')
+        embed = discord.Embed(description=f"**List of Commands for PortalBot:**")
+        embed.add_field(name="**Leaderboards: **", value="!Leaderboard(or !lb) [*optional*] [*optional*]", inline=False)
+        embed.add_field(name="**Levelboards: **", value="!Levelboard(or !lvlb) [*category*] [*level*]", inline=False)
+        embed.add_field(name="**User Profile: **", value="!Profile(or !pf) [*player name*] [*optional*] [*optional*]", inline=False)
+        embed.add_field(name="**Run: **", value="!Run [*player name*] [*category*] [*level*]", inline=False)
+        embed.add_field(name="**For Help with Specific Commands Use:**", value="\"!help [command]\" ex. \"!help *leaderboard*\"", inline=False)
+        await message.channel.send(embed=embed)
     
 
     #Specific Help Commands
@@ -181,32 +162,117 @@ async def on_message(message):
         userMessage = (message.content.lower()).split(" ")
 
         if (userMessage[1] == "leaderboard") or (userMessage[1] == "lb"): #!Leaderboard
-            await message.channel.send('''**!Leaderboard (or !lb) Can Be Used to Get an Image of a Particular Point Leaderboard**\n
-        **\"!Leaderboard\" (Default Command):** This returns an overall points leaderboard of the top 10 runners.\n
-        **\"!Leaderboard Max\":** This returns an overall points leaderboard of all runners. (This is really tall)\n
-        **\"!Leaderboard [NUMBER]\"** | ex. \"!lb *15*\": This returns an overall points leaderboard of the top [NUMBER] runners.\n
-        **\"!Leaderboard [CATEGORY]\"** | ex. \"!lb *inbounds*\": This returns a points leaderboard for the specified category of the top 10 runners.\n
-        **\"!Leaderboard [CATEGORY] [NUMBER]\"** | ex. \"!lb *inbounds 25*\": This returns a points leaderboard for the specified category of the top [NUMBER] runners.\n
-    **Instructions on leaderboards of runs for a specific chamber can be found with \"!help levelboard\".**''')
+            embed = discord.Embed(description=f"**!Leaderboard (or !lb) Can Be Used to Display a Particular Point Leaderboard**")
+            embed.add_field(name="**!Leaderboard (Default Command):**", value="This returns an overall points leaderboard of the top 10 runners.", inline=False)
+            embed.add_field(name="**!Leaderboard Max:**", value="This returns an overall points leaderboard of all runners. (This is really tall)", inline=False)
+            embed.add_field(name="**!Leaderboard [NUMBER]:**", value="ex. \"!lb *15*\": This returns an overall points leaderboard of the top [NUMBER] runners.", inline=False)
+            embed.add_field(name="**!Leaderboard [CATEGORY]:**", value="ex. \"!lb *inbounds*\": This returns a points leaderboard for the specified category of the top 10 runners.", inline=False)
+            embed.add_field(name="**!Leaderboard [CATEGORY] [NUMBER]:**", value="ex. \"!lb *inbounds 25*\": This returns a points leaderboard for the specified category of the top [NUMBER] runners.", inline=False)
+            embed.add_field(name="** **", value="**Instructions on Leaderboards of Runs for a Specific Chamber can be Found with \"!help levelboard\"**", inline=False)
+            await message.channel.send(embed=embed)
 
         elif (userMessage[1] == "levelboard") or (userMessage[1] == "lvlb"): #!Levelboard
-            await message.channel.send('''**!Levelboard (or !lvlb) Can Be Used to Get an Image of a Particular Level's Point Leaderboard**\n
-        **\"!Levelboard [CATEGORY] [LEVEL]\"** | ex. \"!lvlb *inbounds 00/01*\": This returns the top 10 runs of a category.''')
+            embed = discord.Embed(description=f"**!Levelboard (or !lvlb) Can Be Used to Display a Particular Level's Point Leaderboard**", inline=False)
+            embed.add_field(name="**!Levelboard [CATEGORY] [LEVEL]:**", value="ex. \"!lvlb *inbounds 00/01*: This returns the level's points leaderboard.", inline=False)
+            await message.channel.send(embed=embed)
 
         elif (userMessage[1] == "profile") or (userMessage[1] == "pf"): #!Profile
-            await message.channel.send('''**!Profile (or !pf) Can Be Used to Get Different Information or Lists for a Specific Runner**\n
-        **\"!Profile\" (Default Command):** This returns a linked user's top 5 runs and total points. **NOT IMPLEMENTED**\n
-        **\"!Profile [PLAYER]\"** | ex. \"!Profile *Shizzal*\": This returns the user's top 5 runs, overall place w/ total points, and place w/ points for each cat.\n
-        **\"!Profile [PLAYER] [CATEGORY]\"** | ex. \"!Profile *Shizzal* *Inbounds*\": This returns the user's top 10 runs from the category, overall place in the cat and points.\n
-        **\"!Profile [PLAYER] [CATEGORY] All\"** | ex. \"!Profile *Shizzal* *Inbounds* All\": This returns all the user's runs from the category, overall place in the cat and points.\n''')
+            embed = discord.Embed(description=f"**!Profile (or !pf) Can Be Used to Get Different Information or Lists for a Specific Runner**")
+            embed.add_field(name="**!Profile (Default Command):**", value="This returns a linked user's top 5 runs and total points. **NOT IMPLEMENTED**", inline=False)
+            embed.add_field(name="**!Profile [PLAYER]**", value="ex. \"!Profile *Shizzal*\": This returns the user's top 5 runs, overall place w/ total points, and place w/ points for each cat.", inline=False)
+            embed.add_field(name="**!Profile [PLAYER] [CATEGORY]**", value="ex. \"!Profile *Shizzal* *Inbounds*\": This returns the user's top 10 runs from the category, overall place in the cat and points.", inline=False)
+            embed.add_field(name="**!Profile [PLAYER] [CATEGORY] All**", value="ex. \"!Profile *Shizzal* *Inbounds* All\": This returns all the user's runs from the category, overall place in the cat and points.", inline=False)
+            await message.channel.send(embed=embed)
 
-        elif (userMessage[1] == "run"): #!Profile
-            await message.channel.send('''**!Run Can Be Used to Get a Specific IL Run for a Specific Runner**\n
-            **\"!Run [PLAYER] [CATEGORY] [CHAMBER]\"** | ex. !run *RealCreative oob 08*: This returns information on a user's run on a specific IL.\n''')
+        elif (userMessage[1] == "run"): #!Run
+            embed = discord.Embed(description=f"**!Run Can Be Used to Get a Specific IL Run for a Specific Runner**")
+            embed.add_field(name="**!Run [PLAYER] [CATEGORY] [CHAMBER]**", value="ex. !run *RealCreative oob 08*: This returns information on a user's run on a specific IL.", inline=False)
+            await message.channel.send(embed=embed)
 
         else: #Incorrect Entry
             await message.channel.send(f"No Such Command \"!{userMessage[1]}\" Exists")
 
+
+def embedProfile(userMessage, profileCreated):
+    pName = userMessage[1]
+
+    if(len(userMessage) == 2):
+        oPoints = profileCreated[1]
+        cat1 = profileCreated[2]
+        points1 = profileCreated[4]
+        oPlace = profileCreated[0]
+        place1 = profileCreated[3]
+        embed = discord.Embed(description="")
+        embed.set_author(name=f"{pName}'s Profile:")
+        embed.add_field(name=f"**Overall Points:**", value= f"{oPoints}", inline=False)
+        embed.add_field(name=f"**{cat1} Points:**", value= f"{points1}", inline=True)
+
+        if(len(profileCreated) == 5):
+            embed.add_field(name=f"\n**Overall Place:**", value= f"{oPlace}", inline=False)
+            embed.add_field(name=f"**{cat1} Place:**", value= f"{place1}", inline=True)
+
+        if(len(profileCreated) == 8):
+            cat2 = profileCreated[5]
+            points2 = profileCreated[7]
+            place2 = profileCreated[6]
+            embed.add_field(name=f"**{cat2} Points:**", value= f"{points2}", inline=True)
+            embed.add_field(name=f"\n**Overall Place:**", value= f"{oPlace}", inline=False)
+            embed.add_field(name=f"**{cat1} Place:**", value= f"{place1}", inline=True)
+            embed.add_field(name=f"**{cat2} Place:**", value= f"{place2}", inline=True)
+            
+
+        elif(len(profileCreated) == 11):
+            cat2 = profileCreated[5]
+            points2 = profileCreated[7]
+            place2 = profileCreated[6]
+            cat3 = profileCreated[8]
+            points3 = profileCreated[10]
+            place3 = profileCreated[9]
+            embed.add_field(name=f"**{cat2} Points:**", value= f"{points2}", inline=True)
+            embed.add_field(name=f"**{cat3} Points:**", value= f"{points3}", inline=True)
+            embed.add_field(name=f"\n**Overall Place:**", value= f"{oPlace}", inline=False)
+            embed.add_field(name=f"**{cat1} Place:**", value= f"{place1}", inline=True)
+            embed.add_field(name=f"**{cat2} Place:**", value= f"{place2}", inline=True)
+            embed.add_field(name=f"**{cat3} Place:**", value= f"{place3}", inline=True)
+
+    elif(len(userMessage) == 3) or (len(userMessage) == 4):
+        cat1 = profileCreated[1]
+        points = profileCreated[3]
+        place = profileCreated[2]
+        embed = discord.Embed(description="")
+        embed.set_author(name=f"{pName}'s {cat1} Profile:")
+        embed.add_field(name=f"**{cat1} Points:**", value= f"{points}", inline=True)
+        embed.add_field(name=f"**{cat1} Place:**", value= f"{place}", inline=True)
+
+    return embed
+
+
+def embedRun(runInfo):
+    pName = runInfo[0]
+    cat = runInfo[1]
+    chamber = runInfo[2]
+    place = runInfo[3]
+    points = runInfo[4]
+    time = runInfo[5]
+    date = runInfo[8]
+    runLink = runInfo[6]
+    vidLink = runInfo[7]
+    if(vidLink == ""):
+        embed = discord.Embed(description=f"[Run]({runLink}) | N/A)")
+    else:
+        embed = discord.Embed(description=f"[Run]({runLink}) | [Video]({vidLink})")
+
+    embed.set_thumbnail(url="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.freebiesupply.com%2Flogos%2Flarge%2F2x%2Fportal-9-logo-png-transparent.png&f=1&nofb=1")
+    embed.set_author(name=f"{pName}'s {cat} {chamber} Run")
+    if(place == 1):
+        embed.add_field(name="**Place**", value=":trophy: 1", inline=True)
+    else:
+        embed.add_field(name="**Place**", value=f"{place}", inline=True)
+    embed.add_field(name="**Points**", value=f"{points}", inline=True)
+    embed.add_field(name="**Time**", value=f"{time}", inline=True)
+    embed.add_field(name="**Date**", value=f"{date}", inline=True)
+
+    return embed
 
 
 tokenFile = open("botToken.txt", "r")
