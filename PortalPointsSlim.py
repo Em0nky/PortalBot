@@ -193,6 +193,11 @@ class PortalPoints:
             runPlace = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["place"]) #Gets Player Place
             runTime = currentRun["times"]["primary_t"] #Gets Player Time
             playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
+            try:
+                playerID = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].id) #Gets Player ID
+            except:
+                playerID = ""
+
             #playerName = currentRun["players"][0]["uri"] #Not Working Other Way of getting Player Name
             #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Supposed to get ticks
             runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
@@ -201,11 +206,10 @@ class PortalPoints:
                 runVidLink = currentRun["videos"]["links"][0]["uri"]#[0]["uri"]
             except:
                 runVidLink = "N/A"
-
             runLink = currentRun["weblink"]
             runDate = currentRun["date"]
 
-            currentList = [runPlace, playerName, runPoints, runTime, runLink, runVidLink, runDate] #creates single run entry list
+            currentList = [runPlace, playerName, runPoints, runTime, runLink, runVidLink, runDate, playerID] #creates single run entry list
             
             customList.append(currentList) #Adds that run to the full list
             placeCounter += 1
@@ -230,14 +234,18 @@ class PortalPoints:
                     runPlace = (self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["place"])#Gets Player Place
                     runTime = currentRun["times"]["primary_t"] #Gets Player Time
                     runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
+                    try:
+                        playerID = ((self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].players)[0].id) #Gets Player ID
+                    except:
+                        playerID = ""
+
                 else:
                     placeCounter += 1
                     continue
-                currentList = [inputCategory, currentChamber, runPlace, runPoints, runTime] #creates single run entry list
+                currentList = [inputCategory, currentChamber, runPlace, runPoints, runTime, playerID, playerName] #creates single run entry list
 
                 userList.append(currentList) #Adds that run to the full profile list
                 placeCounter += 1
-
         return userList
 
     def createProfileListAll(self, inputPlayerName):
@@ -366,6 +374,8 @@ class PortalPoints:
         playerValues = (f',{category},{playerValues[2]},{playerValues[1]}')
         return playerValues
         
+    def getPlayerID(player):
+        pass
 
     #Image Exports for Leaderboards
     def exportPointsLeaderboardImageDefault(self):
@@ -566,7 +576,10 @@ class PortalPoints:
         catPointsList = self.createSpecificChamberListBot(category, level) 
         df = pd.DataFrame(catPointsList, columns = ['Place', 'Player', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
-        df = df.round(decimals=2)
+        df.Points = df.Points.round(decimals=2)
+        df.Time = df.Time.round(decimals=3)
+        df['Ticks'] = df.apply(lambda row: row.Time/.015, axis = 1)
+        df.Ticks = df.Ticks.round(decimals=0)
 
         boardLength = len(df)
         heightMult = (20 * boardLength) + 300 #Table Height
@@ -578,12 +591,12 @@ class PortalPoints:
         fig = pgo.Figure(data=[pgo.Table(
             #title=f"{category} {level}",
             #font=dict(family="verdana", font_size=15),
-            columnorder = [1,2,3,4],
-            columnwidth = [25, 60, 40, 40],
+            columnorder = [1,2,3,4,5],
+            columnwidth = [25, 60, 40, 40, 40],
             header=dict(values=list(df.columns),
                         fill_color='#ffe196',
                         align='left'),
-            cells=dict(values=[df.Place, df.Player, df.Points, df.Time],
+            cells=dict(values=[df.Place, df.Player, df.Points, df.Time, df.Ticks],
                     fill_color='#96e4ff',
                     align='left'),)
         ])
@@ -604,11 +617,17 @@ class PortalPoints:
 
         #Dataframe Creation
         allCatsPointsList = self.createProfileListAll(player) 
+        playerID = allCatsPointsList[0][5]
+        playerName = allCatsPointsList[0][6]
+        for run in allCatsPointsList:
+            run.remove(playerID)
+            run.remove(playerName)
+
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
         totalPoints = int(df['Points'].sum())
         df.Points = df.Points.round(decimals=2)
-
+        df.Time = df.Time.round(decimals=3)
         df = df.nsmallest(5, 'Place') #Top 5 Runs
 
         #Using plotly to generate table and subsequent image
@@ -631,7 +650,7 @@ class PortalPoints:
         listimg = Image.open("list.png")
         listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
-        return totalPoints
+        return [playerID, playerName]
 
     def exportPlayerProfileCategory(self, player, category):
         """Saves an image containing a player's top 10 ILs of a single category
@@ -641,9 +660,13 @@ class PortalPoints:
         
         pio.kaleido.scope.default_scale = 2.0
         pio.kaleido.scope.default_height = 430 #Table Height
-
         #Dataframe Creation
-        allCatsPointsList = self.createProfileListCategory(player, category) 
+        allCatsPointsList = self.createProfileListCategory(player, category)
+        playerID = allCatsPointsList[0][5]
+        playerName = allCatsPointsList[0][6]
+        for run in allCatsPointsList:
+            run.remove(playerID)
+            run.remove(playerName) 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
         totalPoints = int(df['Points'].sum())
@@ -671,7 +694,7 @@ class PortalPoints:
         listimg = Image.open("list.png")
         listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
-        return totalPoints
+        return [playerID, playerName]
 
     def exportPlayerProfileCategoryAll(self, player, category):
         '''Saves an image containing a player's top 10 ILs of a single category
@@ -680,11 +703,18 @@ class PortalPoints:
             Intended for use in the bot.'''
 
         #Dataframe Creation
-        allCatsPointsList = self.createProfileListCategory(player, category) 
+        pio.kaleido.scope.default_scale = 2.0
+        allCatsPointsList = self.createProfileListCategory(player, category)
+        playerID = allCatsPointsList[0][5]
+        playerName = allCatsPointsList[0][6]
+        for run in allCatsPointsList:
+            run.remove(playerID)
+            run.remove(playerName) 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
         totalPoints = int(df['Points'].sum())
         df.Points = df.Points.round(decimals=2)
+        df.Time = df.Time.round(decimals=3)
 
         boardLength = int(df.size / 5)
         heightMult = (20 * boardLength) + 300
@@ -718,7 +748,7 @@ class PortalPoints:
         listimg = Image.open("list.png")
         listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
         listimg.save("list.png")
-        return totalPoints
+        return [playerID, playerName]
 
 
     #Commands
@@ -864,9 +894,12 @@ class PortalPoints:
 
                 if (missingCats >= 3):
                     return("namefail")
-                self.exportPlayerProfileDefault(userMessage[1])
+                playerStuff = self.exportPlayerProfileDefault(userMessage[1])
+                
+                playerID = playerStuff[0]
+                playerName = playerStuff[1]
                 totalPoints = playerRanking
-                return (str(totalPoints) + str(catRanks))
+                return ([str(totalPoints), str(catRanks), playerID, playerName])
 
             except:
                 return 'srcfail'
@@ -882,9 +915,10 @@ class PortalPoints:
                     return("catfail")
 
                 playerRanking = self.getPlayerRankingCategory(player, category)
-                self.exportPlayerProfileCategory(player, category)
-
-                return playerRanking
+                playerStuff = self.exportPlayerProfileCategory(player, category)
+                playerID = playerStuff[0]
+                playerName = playerStuff[1]
+                return [playerRanking, playerID, playerName]
 
             except:
                 return 'srcfail'
@@ -900,9 +934,10 @@ class PortalPoints:
                     return("catfail")
 
                 playerRanking = self.getPlayerRankingCategory(player, category)
-                self.exportPlayerProfileCategoryAll(player, category)
-
-                return playerRanking
+                playerStuff = self.exportPlayerProfileCategoryAll(player, category)
+                playerID = playerStuff[0]
+                playerName = playerStuff[1]
+                return [playerRanking, playerID, playerName]
 
             except:
                 return 'srcfail'
@@ -930,20 +965,25 @@ class PortalPoints:
 
             catPointsList = self.createSpecificChamberListMore(category, level) 
             
-            df = pd.DataFrame(catPointsList, columns = ['Place', 'Player', 'Points', 'Time', 'Link', 'Video', 'Date'])
+            df = pd.DataFrame(catPointsList, columns = ['Place', 'Player', 'Points', 'Time', 'Link', 'Video', 'Date', 'PlayerID'])
             df = df.sort_values('Points', ascending=False)
-            df = df.round(decimals=2)
+            df.Points = df.Points.round(decimals=2)
+            df.Time = df.Time.round(decimals=3)
+            namedf = df['Player'].copy() 
             df['Player'] = df['Player'].str.lower()
 
-
+            #still need to fix 14
             runValues = (df.loc[df['Player'] == player].values)[0]
+            playerLoc = (df.loc[df['Player'] == player].index)[0]
+            player = (namedf.iloc[[playerLoc]].values)[0] #Gets Original Player Name
             runPlace = runValues[0]
             runPoints = runValues[2]
             runTime = runValues[3]
             runLink  = runValues[4]
             runVid = runValues[5]
             runDate  = runValues[6]
-            runValues = [player, category, level, runPlace, runPoints, runTime, runLink, runVid, runDate]
+            playerID = runValues[7]
+            runValues = [player, category, level, runPlace, runPoints, runTime, runLink, runVid, runDate, playerID]
             return(runValues)
 
         except:
