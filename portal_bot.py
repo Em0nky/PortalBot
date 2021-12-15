@@ -100,12 +100,25 @@ async def on_message(message):
         except:
             await message.channel.send('Invalid Profile Command.')
         
-        if (len(profileCreated) > 8):
-
-            profileCreated = profileCreated.split(",")
+        if (len(profileCreated) == 4):
+            playerID = str(profileCreated[2])
+            playerName = str(profileCreated[3])
+            profileCreatedS = profileCreated[0] + profileCreated[1]
+            profileCreatedS = profileCreatedS.split(",")
 
             file = discord.File("list.png")
-            embed = embedProfile(userMessage, profileCreated)
+            embed = embedProfile(userMessage, profileCreatedS, playerID, playerName)
+            embed.set_image(url="attachment://list.png")
+            await message.channel.send(embed=embed, file=file)
+        
+        elif(len(profileCreated) == 3):
+            playerID = str(profileCreated[1])
+            playerName = str(profileCreated[2])
+            profileCreatedS = profileCreated[0]
+            profileCreatedS = profileCreatedS.split(",")
+
+            file = discord.File("list.png")
+            embed = embedProfile(userMessage, profileCreatedS, playerID, playerName)
             embed.set_image(url="attachment://list.png")
             await message.channel.send(embed=embed, file=file)
 
@@ -132,7 +145,7 @@ async def on_message(message):
 
         if(len(userMessage) == 4 or len(userMessage) == 5):
             runInfo = PP.runCommand(userMessage)
-            if(len(runInfo) == 9):
+            if(len(runInfo) == 10):
                 embed = embedRun(runInfo)
                 await message.channel.send(embed=embed)
 
@@ -193,8 +206,8 @@ async def on_message(message):
             await message.channel.send(f"No Such Command \"!{userMessage[1]}\" Exists")
 
 
-def embedProfile(userMessage, profileCreated):
-    pName = userMessage[1]
+def embedProfile(userMessage, profileCreated, playerID, playerName):
+    pName = playerName
 
     if(len(userMessage) == 2):
         oPoints = profileCreated[1]
@@ -202,8 +215,15 @@ def embedProfile(userMessage, profileCreated):
         points1 = profileCreated[4]
         oPlace = profileCreated[0]
         place1 = profileCreated[3]
+
         embed = discord.Embed(description="")
-        embed.set_author(name=f"{pName}'s Profile:")
+        if(playerID == ""):
+            embed.set_thumbnail(url="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.freebiesupply.com%2Flogos%2Flarge%2F2x%2Fportal-9-logo-png-transparent.png&f=1&nofb=1")
+            embed.set_author(name=f"{pName}'s Profile:")
+        else:
+            embed.set_thumbnail(url=f"https://www.speedrun.com/userasset/{playerID}/image?v=3d18eec")
+            embed.set_author(name=f"{pName}'s Profile:", url=f"https://www.speedrun.com/user/{playerName}")
+            
         embed.add_field(name=f"**Overall Points:**", value= f"{oPoints}", inline=False)
         embed.add_field(name=f"**{cat1} Points:**", value= f"{points1}", inline=True)
 
@@ -215,6 +235,7 @@ def embedProfile(userMessage, profileCreated):
             cat2 = profileCreated[5]
             points2 = profileCreated[7]
             place2 = profileCreated[6]
+
             embed.add_field(name=f"**{cat2} Points:**", value= f"{points2}", inline=True)
             embed.add_field(name=f"\n**Overall Place:**", value= f"{oPlace}", inline=False)
             embed.add_field(name=f"**{cat1} Place:**", value= f"{place1}", inline=True)
@@ -228,6 +249,7 @@ def embedProfile(userMessage, profileCreated):
             cat3 = profileCreated[8]
             points3 = profileCreated[10]
             place3 = profileCreated[9]
+
             embed.add_field(name=f"**{cat2} Points:**", value= f"{points2}", inline=True)
             embed.add_field(name=f"**{cat3} Points:**", value= f"{points3}", inline=True)
             embed.add_field(name=f"\n**Overall Place:**", value= f"{oPlace}", inline=False)
@@ -239,8 +261,15 @@ def embedProfile(userMessage, profileCreated):
         cat1 = profileCreated[1]
         points = profileCreated[3]
         place = profileCreated[2]
+
         embed = discord.Embed(description="")
-        embed.set_author(name=f"{pName}'s {cat1} Profile:")
+        if(playerID == ""):
+            embed.set_thumbnail(url="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.freebiesupply.com%2Flogos%2Flarge%2F2x%2Fportal-9-logo-png-transparent.png&f=1&nofb=1")
+            embed.set_author(name=f"{pName}'s {cat1} Profile:")
+        else:
+            embed.set_thumbnail(url=f"https://www.speedrun.com/userasset/{playerID}/image?v=3d18eec")
+            embed.set_author(name=f"{pName}'s {cat1} Profile:", url=f"https://www.speedrun.com/user/{playerName}")
+
         embed.add_field(name=f"**{cat1} Points:**", value= f"{points}", inline=True)
         embed.add_field(name=f"**{cat1} Place:**", value= f"{place}", inline=True)
 
@@ -257,20 +286,31 @@ def embedRun(runInfo):
     date = runInfo[8]
     runLink = runInfo[6]
     vidLink = runInfo[7]
-    if(vidLink == ""):
-        embed = discord.Embed(description=f"[Run]({runLink}) | N/A)")
+    playerID = runInfo[9]
+    runTicks = (float(time)/.015)
+
+    if(vidLink == "N/A"):
+        embed = discord.Embed(description=f"[Run]({runLink}) | N/A")
     else:
         embed = discord.Embed(description=f"[Run]({runLink}) | [Video]({vidLink})")
 
-    embed.set_thumbnail(url="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.freebiesupply.com%2Flogos%2Flarge%2F2x%2Fportal-9-logo-png-transparent.png&f=1&nofb=1")
-    embed.set_author(name=f"{pName}'s {cat} {chamber} Run")
+    if(playerID == ""):
+        embed.set_thumbnail(url="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.freebiesupply.com%2Flogos%2Flarge%2F2x%2Fportal-9-logo-png-transparent.png&f=1&nofb=1")
+        embed.set_author(name=f"{pName}'s {cat} {chamber} Run")
+    else:
+        embed.set_thumbnail(url=f"https://www.speedrun.com/userasset/{playerID}/image?v=3d18eec")
+        embed.set_author(name=f"{pName}'s {cat} {chamber} Run", url=f"https://www.speedrun.com/user/{pName}")
+
     if(place == 1):
         embed.add_field(name="**Place**", value=":trophy: 1", inline=True)
     else:
         embed.add_field(name="**Place**", value=f"{place}", inline=True)
+
     embed.add_field(name="**Points**", value=f"{points}", inline=True)
+    embed.add_field(name="**Date**", value=f"{date}", inline=False)
     embed.add_field(name="**Time**", value=f"{time}", inline=True)
-    embed.add_field(name="**Date**", value=f"{date}", inline=True)
+    embed.add_field(name="**Ticks**", value=f"{runTicks:.0f}", inline=True)
+    
 
     return embed
 
