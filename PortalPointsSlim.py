@@ -26,7 +26,6 @@ class PortalPoints:
                 apiSuccessGrab = True
                 #api stuff kinda scuffed
                 game = api.search(srcomapi.datatypes.Game, {"name": "Portal"})[0]
-
                 #Grabbing API stuff and assigning into portal runs dict
                 self.portal_runs = {}
                 for category in game.categories:
@@ -35,6 +34,7 @@ class PortalPoints:
                     if category.type == 'per-level':
                         for level in game.levels:
                             self.portal_runs[category.name][level.name] = dt.Leaderboard(api, data=api.get("leaderboards/{}/level/{}/{}?embed=variables".format(game.id, level.id, category.id)))
+                    
             except:
                 #api failed to grab stuff
                 apiSuccessGrab = False
@@ -168,7 +168,6 @@ class PortalPoints:
             runPlace = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["place"]) #Gets Player Place
             runTime = currentRun["times"]["primary_t"] #Gets Player Time
             playerName = ((self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
-            #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Supposed to get Run Ticks
             runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
 
             currentList = [runPlace, playerName, runPoints, runTime] #creates single run entry list
@@ -374,8 +373,6 @@ class PortalPoints:
         playerValues = (f',{category},{playerValues[2]},{playerValues[1]}')
         return playerValues
         
-    def getPlayerID(player):
-        pass
 
     #Image Exports for Leaderboards
     def exportPointsLeaderboardImageDefault(self):
@@ -608,7 +605,7 @@ class PortalPoints:
         listimg.save("list.png")
     
     def exportPlayerProfileDefault(self, player):
-        """Saves an image containing a player's top 5 ILs of all categories
+        """Saves an image containing a player's top 10 ILs of all categories
             Used in conjuction with createProfileListAll
             Default Length of Leaderboard (5)
             Intended for use in the bot."""
@@ -625,19 +622,20 @@ class PortalPoints:
 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
-        totalPoints = int(df['Points'].sum())
         df.Points = df.Points.round(decimals=2)
         df.Time = df.Time.round(decimals=3)
-        df = df.nsmallest(5, 'Place') #Top 5 Runs
+        df['Ticks'] = df.apply(lambda row: row.Time/.015, axis = 1)
+        df.Ticks = df.Ticks.round(decimals=0)
+        df = df.nsmallest(10, 'Place') #Top 5 Runs
 
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
-            columnorder = [1,2,3,4,5],
-            columnwidth = [25, 25, 25, 25, 25],
+            columnorder = [1,2,3,4,5,6],
+            columnwidth = [25, 25, 15, 15, 25, 20],
             header=dict(values=list(df.columns),
                         fill_color='#ffe196',
                         align='left'),
-            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time],
+            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
                     fill_color='#96e4ff',
                     align='left'))
         ])
@@ -667,21 +665,23 @@ class PortalPoints:
         for run in allCatsPointsList:
             run.remove(playerID)
             run.remove(playerName) 
+        
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
-        totalPoints = int(df['Points'].sum())
         df.Points = df.Points.round(decimals=2)
         df.Time = df.Time.round(decimals=3)
+        df['Ticks'] = df.apply(lambda row: row.Time/.015, axis = 1)
+        df.Ticks = df.Ticks.round(decimals=0)
         df = df.nsmallest(10, 'Place')
         
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
-            columnorder = [1,2,3,4,5],
-            columnwidth = [25, 25, 25, 25, 25],
+            columnorder = [1,2,3,4,5,6],
+            columnwidth = [25, 25, 15, 15, 25, 20],
             header=dict(values=list(df.columns),
                         fill_color='#ffe196',
                         align='left'),
-            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time],
+            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
                     fill_color='#96e4ff',
                     align='left'))
         ])
@@ -715,6 +715,8 @@ class PortalPoints:
         totalPoints = int(df['Points'].sum())
         df.Points = df.Points.round(decimals=2)
         df.Time = df.Time.round(decimals=3)
+        df['Ticks'] = df.apply(lambda row: row.Time/.015, axis = 1)
+        df.Ticks = df.Ticks.round(decimals=0)
 
         boardLength = int(df.size / 5)
         heightMult = (20 * boardLength) + 300
@@ -733,12 +735,12 @@ class PortalPoints:
 
         #Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
-            columnorder = [1,2,3,4,5],
-            columnwidth = [25, 25, 25, 25, 25],
+            columnorder = [1,2,3,4,5,6],
+            columnwidth = [25, 25, 15, 15, 25, 20],
             header=dict(values=list(df.columns),
                         fill_color='#ffe196',
                         align='left'),
-            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time],
+            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
                     fill_color='#96e4ff',
                     align='left'))
         ])
@@ -746,7 +748,7 @@ class PortalPoints:
 
         #Cropping the plotly image
         listimg = Image.open("list.png")
-        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 345))
+        listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 505))
         listimg.save("list.png")
         return [playerID, playerName]
 
@@ -971,11 +973,11 @@ class PortalPoints:
             df.Time = df.Time.round(decimals=3)
             namedf = df['Player'].copy() 
             df['Player'] = df['Player'].str.lower()
+            df['Upper'] = namedf
 
             #still need to fix 14
             runValues = (df.loc[df['Player'] == player].values)[0]
-            playerLoc = (df.loc[df['Player'] == player].index)[0]
-            player = (namedf.iloc[[playerLoc]].values)[0] #Gets Original Player Name
+            player = runValues[8]
             runPlace = runValues[0]
             runPoints = runValues[2]
             runTime = runValues[3]

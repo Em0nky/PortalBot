@@ -1,10 +1,11 @@
 from discord import user
 from discord.abc import Messageable
+import time
 import asyncio
 from PortalPointsSlim import PortalPoints
 import discord
 
-#PortalBot V0.0.2
+#PortalBot V0.3.3
 
 #Points Pre-Setup
 PP = PortalPoints()
@@ -208,7 +209,7 @@ async def on_message(message):
 
 def embedProfile(userMessage, profileCreated, playerID, playerName):
     pName = playerName
-
+    time.sleep(1)
     if(len(userMessage) == 2):
         oPoints = profileCreated[1]
         cat1 = profileCreated[2]
@@ -230,6 +231,7 @@ def embedProfile(userMessage, profileCreated, playerID, playerName):
         if(len(profileCreated) == 5):
             embed.add_field(name=f"\n**Overall Place:**", value= f"{oPlace}", inline=False)
             embed.add_field(name=f"**{cat1} Place:**", value= f"{place1}", inline=True)
+            embed.add_field(name=f"**Top 10 Runs:**", value="** **", inline=False)
 
         if(len(profileCreated) == 8):
             cat2 = profileCreated[5]
@@ -240,6 +242,7 @@ def embedProfile(userMessage, profileCreated, playerID, playerName):
             embed.add_field(name=f"\n**Overall Place:**", value= f"{oPlace}", inline=False)
             embed.add_field(name=f"**{cat1} Place:**", value= f"{place1}", inline=True)
             embed.add_field(name=f"**{cat2} Place:**", value= f"{place2}", inline=True)
+            embed.add_field(name=f"**Top 10 Runs:**", value="** **", inline=False)
             
 
         elif(len(profileCreated) == 11):
@@ -256,6 +259,7 @@ def embedProfile(userMessage, profileCreated, playerID, playerName):
             embed.add_field(name=f"**{cat1} Place:**", value= f"{place1}", inline=True)
             embed.add_field(name=f"**{cat2} Place:**", value= f"{place2}", inline=True)
             embed.add_field(name=f"**{cat3} Place:**", value= f"{place3}", inline=True)
+            embed.add_field(name=f"**Top 10 Runs:**", value="** **", inline=False)
 
     elif(len(userMessage) == 3) or (len(userMessage) == 4):
         cat1 = profileCreated[1]
@@ -272,6 +276,10 @@ def embedProfile(userMessage, profileCreated, playerID, playerName):
 
         embed.add_field(name=f"**{cat1} Points:**", value= f"{points}", inline=True)
         embed.add_field(name=f"**{cat1} Place:**", value= f"{place}", inline=True)
+        if(len(userMessage) == 4):
+            embed.add_field(name=f"**All Runs:**", value="** **", inline=False)
+        else:
+            embed.add_field(name=f"**Top 10 Runs:**", value="** **", inline=False)
 
     return embed
 
@@ -302,9 +310,13 @@ def embedRun(runInfo):
         embed.set_author(name=f"{pName}'s {cat} {chamber} Run", url=f"https://www.speedrun.com/user/{pName}")
 
     if(place == 1):
-        embed.add_field(name="**Place**", value=":trophy: 1", inline=True)
+        embed.add_field(name="**Place**", value=":trophy: 1st", inline=True)
+    elif(place == 2):
+        embed.add_field(name="**Place**", value=":second_place: 2nd", inline=True)
+    elif(place == 3):
+        embed.add_field(name="**Place**", value=":third_place: 3rd", inline=True)
     else:
-        embed.add_field(name="**Place**", value=f"{place}", inline=True)
+        embed.add_field(name="**Place**", value=f"{place}th", inline=True)
 
     embed.add_field(name="**Points**", value=f"{points}", inline=True)
     embed.add_field(name="**Date**", value=f"{date}", inline=False)
