@@ -160,6 +160,37 @@ async def on_message(message):
             await message.channel.send("Invalid Run Command")
 
 
+    #Recent Command
+    if message.content.startswith('!Recent') or message.content.startswith('!recent'):
+        userMessage = message.content.split(" ")
+        
+        try:
+            recentCreated = PP.recentCommand(userMessage)
+            file = discord.File("list.png")
+
+            if(len(recentCreated) == 1):
+                embed = discord.Embed(description=f"**{recentCreated[0]}'s Recent 10 Overall Runs:**")
+                embed.set_image(url="attachment://list.png")
+                await message.channel.send(embed=embed, file=file)
+
+            elif(len(recentCreated) == 2):
+                embed = discord.Embed(description=f"**{recentCreated[0]}'s Recent 10 {recentCreated[1]} Runs:**")
+                embed.set_image(url="attachment://list.png")
+                await message.channel.send(embed=embed, file=file)
+
+            else:
+                if(recentCreated == 'srcfail'):
+                    await message.channel.send('Error Retrieving Submission.')
+
+                elif(recentCreated == 'catfail'):
+                    await message.channel.send('Invalid Category.')
+
+                else:
+                    await message.channel.send('Invalid Recent Command.')
+
+        except:
+            await message.channel.send('Invalid Recent Command.')
+
     #Help Command
     if (message.content).lower() == ('!help'):
         embed = discord.Embed(description=f"**List of Commands for PortalBot:**")
@@ -208,6 +239,7 @@ async def on_message(message):
 
 
 def embedProfile(userMessage, profileCreated, playerID, playerName):
+    '''Creates an embed for the profile command'''
     pName = playerName
     time.sleep(1)
     if(len(userMessage) == 2):
@@ -285,6 +317,7 @@ def embedProfile(userMessage, profileCreated, playerID, playerName):
 
 
 def embedRun(runInfo):
+    '''Creates an embed for the run command.'''
     pName = runInfo[0]
     cat = runInfo[1]
     chamber = runInfo[2]

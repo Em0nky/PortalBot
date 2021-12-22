@@ -259,6 +259,52 @@ class PortalPoints:
 
         return userList
 
+    def createProfileListCategoryDate(self, inputPlayerName, inputCategory):
+        """Returns a 2D list of IL runs with points for a specific person for a specific category
+        List Format: CATEGORY, CHAMBER, PLAYER, PLACE, POINTS, TIME, TICKS, DATE"""
+
+        userList = []
+
+        for currentChamber in self.chamberList:
+            currentList = []
+            placeCounter = 0
+            #runPlace, runTime, playerName, runPoints
+            while placeCounter < (len(self.portal_runs[inputCategory][currentChamber].runs)):
+                playerName = ((self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
+                
+                if(playerName.lower() == inputPlayerName.lower()):
+                    currentRun = self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].data
+                    runPlace = (self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["place"])#Gets Player Place
+                    runTime = currentRun["times"]["primary_t"] #Gets Player Time
+                    runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
+                    runDate = currentRun["date"]#["submitted"]
+                    runTicks = runTime/.015
+                    try:
+                        playerID = ((self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].players)[0].id) #Gets Player ID
+                    except:
+                        playerID = ""
+
+                else:
+                    placeCounter += 1
+                    continue
+                currentList = [inputCategory, currentChamber, runPlace, runPoints, runTime, playerID, playerName, runTicks, runDate] #creates single run entry list
+
+                userList.append(currentList) #Adds that run to the full profile list
+                placeCounter += 1
+        return userList
+
+    def createProfileListAllDate(self, inputPlayerName):
+        """Returns a 2D list of IL runs with points and date for a specific person for all categories
+        List Format: CATEGORY, CHAMBER, PLAYER, PLACE, POINTS, TIME, TICKS, DATE"""
+
+        userList = []
+        
+        userList.extend(self.createProfileListCategoryDate(inputPlayerName, "Out of Bounds"))
+        userList.extend(self.createProfileListCategoryDate(inputPlayerName, "Inbounds"))
+        userList.extend(self.createProfileListCategoryDate(inputPlayerName, "Glitchless"))
+
+        return userList
+
 
     #Points Leaderboards
     def createAllCatPointsList(self):
@@ -712,7 +758,6 @@ class PortalPoints:
             run.remove(playerName) 
         df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time'])
         df = df.sort_values('Points', ascending=False)
-        totalPoints = int(df['Points'].sum())
         df.Points = df.Points.round(decimals=2)
         df.Time = df.Time.round(decimals=3)
         df['Ticks'] = df.apply(lambda row: row.Time/.015, axis = 1)
@@ -751,6 +796,102 @@ class PortalPoints:
         listimg = listimg.crop((160, 200, 1240, (heightMult*2) - 505))
         listimg.save("list.png")
         return [playerID, playerName]
+
+    def exportPlayerProfileDefaultDate(self, player):
+        """Saves an image containing a player's recent 10 ILs of all categories
+            Sorted by Date Submitted
+            Used in conjuction with createProfileListAll
+            Default Length of Leaderboard (5)
+            Intended for use in the bot."""
+
+        pio.kaleido.scope.default_scale = 2.0
+
+        #Dataframe Creation
+        allCatsPointsList = self.createProfileListAllDate(player) 
+        playerID = allCatsPointsList[0][5]
+        playerName = allCatsPointsList[0][6]
+        for run in allCatsPointsList:
+            run.remove(playerID)
+            run.remove(playerName)
+
+
+        df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks', 'Date'])
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
+        df = df.sort_values(by='Date', ascending=False)
+        df.Points = df.Points.round(decimals=2)
+        df.Time = df.Time.round(decimals=3)
+        df.Ticks = df.Ticks.round(decimals=0)
+        df = df.head(10) #Recent 10 Runs
+
+        #Using plotly to generate table and subsequent image
+        fig = pgo.Figure(data=[pgo.Table(
+            columnorder = [1,2,3,4,5,6,7],
+            columnwidth = [25, 20, 15, 15, 15, 15, 20],
+            header=dict(values=list(df.columns),
+                        fill_color='#ffe196',
+                        align='left'),
+            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks, df.Date],
+                    fill_color='#96e4ff',
+                    align='left'))
+        ])
+        boardLength = len(df)
+        heightMult = (20 * boardLength) + 300
+        pio.kaleido.scope.default_height = heightMult
+        fig.write_image("list.png")
+
+        #Cropping the plotly image
+        listimg = Image.open("list.png")
+        listimg = listimg.crop((160, 200, 1227, (heightMult*2) - 345))
+        listimg.save("list.png")
+        return [playerName]
+
+    def exportPlayerProfileCategoryDate(self, player, category):
+        """Saves an image containing a player's recent 10 ILs of a single category
+            Sorted by Date Submitted
+            Used in conjuction with createProfileListAll
+            Default Length of Leaderboard (10)
+            Intended for use in the bot."""
+        
+        pio.kaleido.scope.default_scale = 2.0
+        pio.kaleido.scope.default_height = 430 #Table Height
+
+        #Dataframe Creation
+        allCatsPointsList = self.createProfileListCategoryDate(player, category)
+        playerID = allCatsPointsList[0][5]
+        playerName = allCatsPointsList[0][6]
+        for run in allCatsPointsList:
+            run.remove(playerID)
+            run.remove(playerName) 
+        
+        df = pd.DataFrame(allCatsPointsList, columns = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks', 'Date'])
+        df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
+        df = df.sort_values(by='Date', ascending=False)
+        df.Points = df.Points.round(decimals=2)
+        df.Time = df.Time.round(decimals=3)
+        df.Ticks = df.Ticks.round(decimals=0)
+        df = df.head(10) #Recent 10 Runs
+
+        #Using plotly to generate table and subsequent image
+        fig = pgo.Figure(data=[pgo.Table(
+            columnorder = [1,2,3,4,5,6,7],
+            columnwidth = [25, 20, 15, 15, 15, 15, 20],
+            header=dict(values=list(df.columns),
+                        fill_color='#ffe196',
+                        align='left'),
+            cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks, df.Date],
+                    fill_color='#96e4ff',
+                    align='left'))
+        ])
+        boardLength = len(df)
+        heightMult = (20 * boardLength) + 300
+        pio.kaleido.scope.default_height = heightMult
+        fig.write_image("list.png")
+
+        #Cropping the plotly image
+        listimg = Image.open("list.png")
+        listimg = listimg.crop((160, 200, 1227, (heightMult*2) - 345))
+        listimg.save("list.png")
+        return [playerName]
 
 
     #Commands
@@ -868,6 +1009,8 @@ class PortalPoints:
 
     def userprofileCommand(self, userMessage):
         '''Command used for the bot to make a user profile
+        !Profile
+        Potentially to be added with database to link discord profile with src
         !Profile [PLAYER]
         Includes user's top 5 runs, overall place w/ total points, and place w/ points for each cat 
         !Profile [PLAYER] [CATEGORY]
@@ -990,6 +1133,47 @@ class PortalPoints:
 
         except:
             return "fail"
+
+    def recentCommand(self, userMessage):
+        '''Command used for the bot to make a list of recent runs
+        !recent
+        Potentially to be added with database to link discord profile with src
+        !recent [PLAYER]
+        Overall recent runs
+        !recent [PLAYER] [CATEGORY]
+        Category recent runs
+        '''
+
+        if (len(userMessage) == 1):
+            #Not Implemented
+            pass
+
+        elif (len(userMessage) == 2):
+            #!Recent [PLAYER]
+            try:
+                player = userMessage[1]
+                playerName = self.exportPlayerProfileDefaultDate(player)
+                return (playerName)
+
+            except:
+                return 'srcfail'
+
+        elif (len(userMessage) == 3):
+            #!Recent [PLAYER] [CATEGORY]
+            try:
+                player = userMessage[1]
+                category = userMessage[2]
+                category = self.inputToCategory(category)
+
+                if(category == ''):
+                    return("catfail")
+
+                playerName = self.exportPlayerProfileCategoryDate(player, category)
+                playerName = playerName[0]
+                return ([playerName, category])
+
+            except:
+                return 'srcfail'
 
 
     #Input Filtering
