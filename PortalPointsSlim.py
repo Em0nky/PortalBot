@@ -277,7 +277,7 @@ class PortalPoints:
                     runPlace = (self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["place"])#Gets Player Place
                     runTime = currentRun["times"]["primary_t"] #Gets Player Time
                     runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
-                    runDate = currentRun["date"]#["submitted"]
+                    runDate = currentRun["date"] #Gets Run Date
                     runTicks = runTime/.015
                     try:
                         playerID = ((self.portal_runs[inputCategory][currentChamber].runs[placeCounter]["run"].players)[0].id) #Gets Player ID

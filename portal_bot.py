@@ -9,7 +9,11 @@ import discord
 
 #Points Pre-Setup
 PP = PortalPoints()
-
+PP.createGlessList()
+time.sleep(20)
+PP.createInboundsList()
+time.sleep(20)
+PP.createOobList()
 
 client = discord.Client()
 
