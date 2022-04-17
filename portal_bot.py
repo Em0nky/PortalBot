@@ -7,7 +7,6 @@ import discord
 # Points Pre-Setup
 dbHelper = DBHelper()
 client = discord.Client()
-client.run(open("botToken.txt", "r").read())
 
 
 @client.event
@@ -409,3 +408,6 @@ def embedRun(runInfo):
     embed.add_field(name="**Ticks**", value=f"{runTicks:.0f}", inline=True)
 
     return embed
+
+
+client.run(open("botToken.txt", "r").read())
