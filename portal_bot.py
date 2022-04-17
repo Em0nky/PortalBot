@@ -2,18 +2,13 @@ from discord import user
 from discord.abc import Messageable
 import time
 import asyncio
-from PortalPointsSlim import PortalPoints
+from DBHelper import DBHelper
 import discord
 
 #PortalBot V0.3.3
 
 #Points Pre-Setup
-PP = PortalPoints()
-PP.createGlessList()
-time.sleep(20)
-PP.createInboundsList()
-time.sleep(20)
-PP.createOobList()
+PP = DBHelper()
 
 client = discord.Client()
 
@@ -102,6 +97,7 @@ async def on_message(message):
         
         try:
             profileCreated = PP.userprofileCommand(userMessage)
+            print(profileCreated)
         except:
             await message.channel.send('Invalid Profile Command.')
         
@@ -202,6 +198,7 @@ async def on_message(message):
         embed.add_field(name="**Levelboards: **", value="!Levelboard(or !lvlb) [*category*] [*level*]", inline=False)
         embed.add_field(name="**User Profile: **", value="!Profile(or !pf) [*player name*] [*optional*] [*optional*]", inline=False)
         embed.add_field(name="**Run: **", value="!Run [*player name*] [*category*] [*level*]", inline=False)
+        embed.add_field(name="**Recent: **", value="!Recent [*player name*] [*optional*]", inline=False)
         embed.add_field(name="**For Help with Specific Commands Use:**", value="\"!help [command]\" ex. \"!help *leaderboard*\"", inline=False)
         await message.channel.send(embed=embed)
     
@@ -236,6 +233,16 @@ async def on_message(message):
         elif (userMessage[1] == "run"): #!Run
             embed = discord.Embed(description=f"**!Run Can Be Used to Get a Specific IL Run for a Specific Runner**")
             embed.add_field(name="**!Run [PLAYER] [CATEGORY] [CHAMBER]**", value="ex. !run *RealCreative oob 08*: This returns information on a user's run on a specific IL.", inline=False)
+            await message.channel.send(embed=embed)
+
+        elif (userMessage[1] == "recent"): #!Recent
+            embed = discord.Embed(description=f"**!Recent Can Be Used to Get the Most Recent 10 IL Runs for a Specific Runner**")
+            embed.add_field(name="**!Recent [PLAYER]**", value="ex. !recent *Eleks*: This returns the most recent 10 ILs.", inline=False)
+            embed.add_field(name="**!Recent [PLAYER] [CATEGORY]**", value="ex. !recent *Eleks Inbounds*: This returns the most recent 10 ILs in a specific category.", inline=False)
+            await message.channel.send(embed=embed)
+
+        elif (userMessage[1] == "help"): #!Help
+            embed = discord.Embed(description=f"**The help command that you just used.**")
             await message.channel.send(embed=embed)
 
         else: #Incorrect Entry
