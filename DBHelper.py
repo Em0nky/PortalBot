@@ -1,7 +1,9 @@
 import sqlite3
-import pandas
 from sqlite3 import Error
-import plotly.graph_objects as pgo, plotly.io as pio
+
+import pandas
+import plotly.graph_objects as pgo
+import plotly.io as pio
 from PIL import Image
 
 
@@ -20,7 +22,6 @@ class DBHelper:
         self.conn = None
         try:
             self.conn = sqlite3.connect(file)
-            print(f'Using SQLite version %s', sqlite3.version)  # TODO not sure why you print the version?
         except Error as e:
             print(e)
 
@@ -50,12 +51,13 @@ class DBHelper:
         # Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
             columnorder=[2, 3, 1],
-            columnwidth=[60, 40, 25],
+            columnwidth=[50, 40, 25],
             header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Player, df.Points, df.Ranking],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         fig.write_image("list.png")
@@ -578,47 +580,39 @@ class DBHelper:
         Includes specification of category, length, and of both category and length
         """
 
-        boardLength = 10
-
-        """
-        !Leaderboard [NUMBER]   
-        !Leaderboard Max
-        !Leaderboard [CATEGORY]
-        """
-        if len(userMessage) == 2:
+        if len(userMessage) == 1:
 
             # !Leaderboard [NUMBER] creates specified length leaderboard
-            if userMessage[1].isnumeric():  # numeric leaderboard requests(i.e. 15, 100)
-                boardLength = int(userMessage[1])
+            if userMessage[0].isnumeric():  # numeric leaderboard requests(i.e. 15, 100)
+                boardLength = int(userMessage[0])
 
                 # If board length is less than 300 but more than 0
                 if 300 > boardLength > 0:
                     try:
+
                         self.exportPointsLeaderboardImage(boardLength)
                         return f"Top {boardLength} Overall Players"
 
-                    except:
-                        print('somethin went wrong')
-                        return "fail"
+                    except Error:
+                        return "Error fetching data from database."
                 else:
-                    return "lengthfail"
+                    return "Error: Invalid leaderboard length."
 
             else:  # Non-numeric leaderboard requests(i.e. max, inbounds, oob)
                 # !Leaderboard max creates whole leaderboard
-                if userMessage[1].lower() == "max":
+                if userMessage[0].lower() == "max":
                     try:
                         self.exportPointsLeaderboardImageMax()
                         return "All Players Overall"
-                    except:
-                        print('Error')
-                        return "fail"
+                    except Error:
+                        return "Error fetching data from database."
 
                 # !Leaderboard [CATEGORY] creates specific category leaderboard
-                elif (userMessage[1].lower() == "inbounds" or userMessage[1].lower() == "inbob" or \
-                      userMessage[1].lower() == "oob" or userMessage[1].lower() == "gless" or userMessage[
-                          1].lower() == "glitchless"):
+                elif (userMessage[0].lower() == "inbounds" or userMessage[0].lower() == "inbob" or
+                      userMessage[0].lower() == "oob" or userMessage[0].lower() == "gless" or userMessage[
+                          0].lower() == "glitchless"):
                     try:
-                        category = userMessage[1]
+                        category = userMessage[0]
                         category = self.inputToCategory(category)
                         if category == '':
                             return "catfail"
@@ -627,69 +621,53 @@ class DBHelper:
 
                         return f"Top {category} Players"
 
-                    except:
-                        print('Error')
-                        return "fail"
+                    except Error:
+                        return "Error fetching data from database."
 
                 else:
-                    return "modfail"
+                    return f"Error: Invalid argument {userMessage[0]}"
 
         # Leaderboard [CATEGORY] [NUMBER] creates a specific category leaderboard of specific length
         elif len(userMessage) == 3:
             try:
+
                 category = userMessage[1]
                 category = self.inputToCategory(category)
-
-                userMessage[2].isnumeric()
-                if category == '':
-                    return "catfail"
-
-                elif not (0 < int(userMessage[2]) < 300 and userMessage[2].isnumeric()):
-                    return "lengthfail"
-
                 boardLength = int(userMessage[2])
                 self.exportCatPointsLeaderboardImage(category, boardLength)
                 return f"Top {boardLength} {category} Players"
 
-            except:
-                print('Error')
-                return "fail"
+            except Error:
+                return "Error fetching data from database."
 
-        else:  # !Leaderboard
+        else:
             try:
                 # !Leaderboard creates default length (10) leaderboard
                 self.exportPointsLeaderboardImageDefault()
                 return f"Top Overall Players"
-            except:
-                print('something went wrong')
-                return "fail"
+
+            except Error:
+                return "Error fetching data from database."
 
     def levelboardCommand(self, userMessage):
         """Command used for the bot to make level leaderboards
         Includes required specification of category and chamber"""
 
-        category = userMessage[1]
-        level = userMessage[2]
-        if len(userMessage) == 4:
-            level = (userMessage[2] + userMessage[3]).replace(' ', '')
+        category = userMessage[0].lower()
+        level = userMessage[1]
+        if len(userMessage) == 3:
+            level = (userMessage[1] + userMessage[2]).replace(' ', '')
 
         category = self.inputToCategory(category)
         level = self.inputToChamber(level)
 
-        if category == '' or level == '':
-            if category == '':
-                return "catfail"
-            elif level == '':
-                return "chamberfail"
-            else:
-                return "fail"
-
-        try:
+        if category == '':
+            return "Error: Category not found."
+        elif level == '':
+            return "Error: Chamber not found."
+        else:
             self.exportChamberPointsLeaderboardImage(category, level)
             return f"**{category} {level} Leaderboard:**"
-
-        except:
-            return "fail"
 
     def userprofileCommand(self, userMessage):
         """Command used for the bot to make a user profile
@@ -715,11 +693,10 @@ class DBHelper:
         # Returns - userMessage, [Oplace, Opoints, cat1, place1, points1...], playerID, playerName
 
         try:
-            if len(userMessage) == 2:
-                playerName = str(userMessage[1])
+            if len(userMessage) == 1:
+                playerName = str(userMessage[0])
 
                 nameID = self.exportPlayerProfileDefault(playerName)
-                print(nameID)
                 playerName = nameID[1]
                 playerID = nameID[0]
                 catRanks = ""
@@ -742,8 +719,7 @@ class DBHelper:
                         df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
                         df = df.round(decimals=2)
                         df = df[df['RunnerName'] == playerName]  # Only Player Row
-                        print(df)
-                        # if df
+                        # TODO if df
                         cPlace = df['Ranking'].loc[df.index[0]]  # Gets Cat Place
                         cPoints = df['Points'].loc[df.index[0]]  # Gets Cat Place
                         catRanks = catRanks + f',{cat},{cPlace},{cPoints}'
@@ -752,24 +728,18 @@ class DBHelper:
                         missingCats += 1
                         print(f"Player Doesn't have {cat} ILs")
 
-                print(missingCats)
                 if missingCats >= 3:
-                    return "namefail"
+                    return "Error: Invalid Category"
 
                 returnArray = [str(f'{oPlace},{oPoints}'), str(catRanks), playerID, playerName]
-                print(returnArray)
                 return returnArray
 
-            elif len(userMessage) == 3:
+            elif len(userMessage) == 2:
                 try:
-                    playerName = str(userMessage[1])
-                    category = str(userMessage[2])
-                    category = self.inputToCategory(category)
-                    # missingCats = 0 TODO Unused variable?
-                    print("one")
 
-                    if category == '':
-                        return "catfail"
+                    playerName = str(userMessage[0])
+                    category = str(userMessage[1])
+                    category = self.inputToCategory(category)
 
                     nameID = self.exportPlayerProfileDefault(playerName)
                     print(category)
@@ -793,8 +763,8 @@ class DBHelper:
                     print(returnArray)
                     return returnArray
 
-                except:
-                    return 'namefail'
+                except Error:
+                    return 'Error fetching data from database.'
 
             elif len(userMessage) == 4:
                 try:
@@ -804,7 +774,7 @@ class DBHelper:
                     missingCats = 0
 
                     if category == '':
-                        return "catfail"
+                        return "Error: Invalid category"
 
                     nameID = self.exportPlayerProfileDefault(playerName)
                     playerName = nameID[1]
@@ -825,36 +795,37 @@ class DBHelper:
                     print(returnArray)
                     return returnArray
 
-                except:
-                    return 'namefail'
+                except Error:
+                    return 'Error fetching data from database.'
 
         except:
-            return 'srcfail'
+            return 'Error fetching data from speedrun.com'
 
     def runCommand(self, userMessage):
-        '''Command used for the bot to return information on a run
-        !Run [PLAYER] [CATEGORY] [CHAMBER]'''
+        """Command used for the bot to return information on a run
+        !Run [PLAYER] [CATEGORY] [CHAMBER]"""
+
+        print(userMessage)
+
+        level = userMessage[2]
+
+        if len(userMessage) == 4:
+            level = (userMessage[2] + userMessage[3]).replace(' ', '')
+
+        player = userMessage[0]
+        category = self.inputToCategory(userMessage[1])
+        level = self.inputToChamber(level)
+
+        print(category)
 
         try:
-            player = userMessage[1]
-            category = userMessage[2]
-            level = userMessage[3]
-            lowerPlayer = player.lower()
-            if len(userMessage) == 5:
-                level = (userMessage[3] + userMessage[4]).replace(' ', '')
-
-            category = self.inputToCategory(category)
-            level = self.inputToChamber(level)
-
-            if category == '' or level == '' or player == '':
-                return "fail"
 
             undLevel = level.replace(' ', '_')
             undCategory = category.replace(' ', '_')
             df = pandas.read_sql_query(f"SELECT * FROM {undCategory}_{undLevel};", self.conn)
 
             df['RunnerNameLower'] = df['RunnerName'].str.lower()
-            df = df[df['RunnerNameLower'] == lowerPlayer]
+            df = df[df['RunnerNameLower'] == player.lower()]
             playerName = df['RunnerName'].loc[df.index[0]]
 
             # still need to fix 14
@@ -869,11 +840,14 @@ class DBHelper:
             runDate = runValues[8].replace('_', '-')
             playerID = runValues[4]
             runValues = [player, category, level, runPlace, runPoints, runTime, runLink, runVid, runDate, playerID]
-            print(runValues)
+
+            print(f'debug', runValues)
             return runValues
 
-        except:
-            return "fail"
+        except Error:
+            return "Error fetching data from database."
+        except IndexError:
+            return f'Error: {player} does not have an IL run in {category} {level}'
 
     def recentCommand(self, userMessage):
         """Command used for the bot to make a list of recent runs
@@ -885,25 +859,25 @@ class DBHelper:
         Category recent runs
         """
 
-        if len(userMessage) == 1:
+        if len(userMessage) == 0:
             # Not Implemented
             pass
 
-        elif len(userMessage) == 2:
+        elif len(userMessage) == 1:
             # !Recent [PLAYER]
             try:
-                player = userMessage[1]
+                player = userMessage[0]
                 playerName = self.exportPlayerProfileDefaultDate(player)
                 return playerName
 
             except:
                 return 'fail'
 
-        elif len(userMessage) == 3:
+        elif len(userMessage) == 2:
             # !Recent [PLAYER] [CATEGORY]
             try:
-                player = userMessage[1]
-                category = userMessage[2]
+                player = userMessage[0]
+                category = userMessage[1]
                 category = self.inputToCategory(category)
 
                 if category == '':
@@ -916,19 +890,19 @@ class DBHelper:
             except:
                 return 'fail'
 
-        # Input Filtering
-
     def inputToCategory(self, userCategory):
         """Takes input and converts it to correctly formatted category name"""
-        userCategory = userCategory.lower()
 
-        if userCategory == "inbob" or "inbounds":  # Inbounds
+        userCategory = userCategory.lower()
+        print(userCategory)
+
+        if userCategory == "inbob" or userCategory == "inbounds" or userCategory == "i":
             return "Inbounds"
 
-        elif userCategory == "oob":  # Out of Bounds
+        elif userCategory == "oob" or userCategory == "o":
             return "Out of Bounds"
 
-        elif userCategory == "gless" or "glitchless":  # Glitchless
+        elif userCategory == "gless" or userCategory == "glitchless" or userCategory == "g":
             return "Glitchless"
 
         else:
