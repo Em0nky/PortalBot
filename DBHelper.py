@@ -669,7 +669,10 @@ class DBHelper:
             return "Error: Chamber not found."
         else:
             self.exportChamberPointsLeaderboardImage(category, level)
-            return f"**{category} {level.replace('_', '/')} Leaderboard:**"
+            replacement = '/'
+            if level.lower().startswith('adv'):
+                replacement = ' '
+            return f"**{category} {level.replace('_', replacement)} Leaderboard:**"
 
     def userprofileCommand(self, userMessage):
         """Command used for the bot to make a user profile
