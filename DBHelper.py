@@ -89,12 +89,13 @@ class DBHelper:
         # Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
             columnorder=[2, 3, 1],
-            columnwidth=[60, 40, 25],
+            columnwidth=[50, 40, 25],
             header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Player, df.Points, df.Ranking],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         fig.write_image("list.png")
@@ -120,12 +121,13 @@ class DBHelper:
         # Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
             columnorder=[2, 3, 1],
-            columnwidth=[60, 40, 25],
+            columnwidth=[50, 40, 25],
             header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Player, df.Points, df.Ranking],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
 
@@ -159,12 +161,13 @@ class DBHelper:
         # Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
             columnorder=[2, 3, 1],
-            columnwidth=[60, 40, 25],
+            columnwidth=[50, 40, 25],
             header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Player, df.Points, df.Ranking],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         fig.write_image("list.png")
@@ -198,12 +201,13 @@ class DBHelper:
         # Uses plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
             columnorder=[2, 3, 1],
-            columnwidth=[60, 40, 25],
+            columnwidth=[50, 40, 25],
             header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Player, df.Points, df.Ranking],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         fig.write_image("list.png")
@@ -231,12 +235,13 @@ class DBHelper:
         # Uses plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
             columnorder=[2, 3, 1],
-            columnwidth=[60, 40, 25],
+            columnwidth=[50, 40, 25],
             header=dict(values=list(df.columns),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Player, df.Points, df.Ranking],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
 
@@ -284,11 +289,12 @@ class DBHelper:
             columnorder=[1, 2, 3, 4, 5],
             columnwidth=[25, 60, 40, 40, 40],
             header=dict(values=list(columnHeaders),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Place, df.Player, df.Points, df.Time, df.Ticks],
-                       fill_color='#96e4ff',
-                       align='left'), )
+                       fill_color='#D3D3D3',
+                       align='left'))
         ])
         fig.write_image("list.png")
 
@@ -327,14 +333,16 @@ class DBHelper:
         columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks']
 
         # Using plotly to generate table and subsequent image
+
         fig = pgo.Figure(data=[pgo.Table(
             columnorder=[0, 1, 2, 3, 4, 5],
             columnwidth=[25, 25, 15, 15, 25, 20],
             header=dict(values=list(columnHeaders),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         boardLength = len(df)
@@ -387,11 +395,13 @@ class DBHelper:
             columnorder=[0, 1, 2, 3, 4, 5],
             columnwidth=[25, 25, 15, 15, 25, 20],
             header=dict(values=list(columnHeaders),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
+
         ])
         boardLength = len(df)
         heightMult = (20 * boardLength) + 300
@@ -454,10 +464,11 @@ class DBHelper:
             columnorder=[0, 1, 2, 3, 4, 5],
             columnwidth=[25, 25, 15, 15, 25, 20],
             header=dict(values=list(columnHeaders),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         boardLength = len(df)
@@ -505,10 +516,11 @@ class DBHelper:
             columnorder=[0, 1, 2, 3, 4, 5, 6],
             columnwidth=[25, 20, 15, 15, 15, 15, 20],
             header=dict(values=list(columnHeaders),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks, df.Date],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         boardLength = len(df)
@@ -557,10 +569,11 @@ class DBHelper:
             columnorder=[0, 1, 2, 3, 4, 5, 6],
             columnwidth=[25, 20, 15, 15, 15, 15, 20],
             header=dict(values=list(columnHeaders),
-                        fill_color='#ffe196',
+                        fill_color='#1b1b1b',
+                        font=dict(color='white', size=12),
                         align='left'),
             cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks, df.Date],
-                       fill_color='#96e4ff',
+                       fill_color='#D3D3D3',
                        align='left'))
         ])
         boardLength = len(df)
