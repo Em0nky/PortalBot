@@ -607,22 +607,18 @@ class DBHelper:
                     except Error:
                         return "Error fetching data from database."
 
-                # !Leaderboard [CATEGORY] creates specific category leaderboard
-                elif (userMessage[0].lower() == "inbounds" or userMessage[0].lower() == "inbob" or
-                      userMessage[0].lower() == "oob" or userMessage[0].lower() == "gless" or userMessage[
-                          0].lower() == "glitchless"):
-                    try:
-                        category = userMessage[0]
-                        category = self.inputToCategory(category)
-                        if category == '':
-                            return "catfail"
 
-                        self.exportCatPointsLeaderboardImageDefault(category)
+                try:
+                    category = self.inputToCategory(userMessage[0])
+                    if category == '':
+                        return "catfail"
 
-                        return f"Top {category} Players"
+                    self.exportCatPointsLeaderboardImageDefault(category)
 
-                    except Error:
-                        return "Error fetching data from database."
+                    return f"Top {category} Players"
+
+                except Error:
+                    return "Error fetching data from database."
 
                 else:
                     return f"Error: Invalid argument {userMessage[0]}"
@@ -870,15 +866,15 @@ class DBHelper:
                 playerName = self.exportPlayerProfileDefaultDate(player)
                 return playerName
 
-            except:
+            except Error:
                 return 'fail'
 
         elif len(userMessage) == 2:
             # !Recent [PLAYER] [CATEGORY]
             try:
+
                 player = userMessage[0]
-                category = userMessage[1]
-                category = self.inputToCategory(category)
+                category = self.inputToCategory(userMessage[1])
 
                 if category == '':
                     return "catfail"
@@ -887,7 +883,7 @@ class DBHelper:
                 playerName = playerName[0]
                 return [playerName, category]
 
-            except:
+            except Error:
                 return 'fail'
 
     def inputToCategory(self, userCategory):
