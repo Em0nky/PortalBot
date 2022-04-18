@@ -607,8 +607,7 @@ class DBHelper:
                     except Error:
                         return "Error fetching data from database."
 
-
-                try:
+                else:
                     category = self.inputToCategory(userMessage[0])
                     if category == '':
                         return "catfail"
@@ -616,12 +615,6 @@ class DBHelper:
                     self.exportCatPointsLeaderboardImageDefault(category)
 
                     return f"Top {category} Players"
-
-                except Error:
-                    return "Error fetching data from database."
-
-                else:
-                    return f"Error: Invalid argument {userMessage[0]}"
 
         # Leaderboard [CATEGORY] [NUMBER] creates a specific category leaderboard of specific length
         elif len(userMessage) == 3:
@@ -663,7 +656,7 @@ class DBHelper:
             return "Error: Chamber not found."
         else:
             self.exportChamberPointsLeaderboardImage(category, level)
-            return f"**{category} {level} Leaderboard:**"
+            return f"**{category} {level.replace('_', '/')} Leaderboard:**"
 
     def userprofileCommand(self, userMessage):
         """Command used for the bot to make a user profile
@@ -715,7 +708,7 @@ class DBHelper:
                         df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
                         df = df.round(decimals=2)
                         df = df[df['RunnerName'] == playerName]  # Only Player Row
-                        # TODO if df
+                        # TODO if df what do you mean by this?? ^lun
                         cPlace = df['Ranking'].loc[df.index[0]]  # Gets Cat Place
                         cPoints = df['Points'].loc[df.index[0]]  # Gets Cat Place
                         catRanks = catRanks + f',{cat},{cPlace},{cPoints}'
