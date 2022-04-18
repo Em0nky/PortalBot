@@ -9,7 +9,7 @@ async def on_command(event, args):
         await event.channel.send('Missing arguments: `!help run`')
         return
 
-    if len(args) > 3:
+    if len(args) >= 3:
 
         runInfo = dbHelper.runCommand(args)
 
