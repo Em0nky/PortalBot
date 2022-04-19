@@ -137,12 +137,21 @@ def embedProfile(userMessage, profileCreated, playerID, playerName):
 
 def convert_to_ticks(input_str):
 
+    minutes = ''
+    seconds = ''
+    millis = ''
     time_override = input_str.replace(':', '#').replace('.', '#')
     time_split = time_override.split('#')
-    mins = int(time_split[0])
-    seconds = int(time_split[1])
-    millis = int(time_split[2])
-    ticks = ((mins * 60000) + (seconds * 1000) + millis) / 15
+    print(len(time_split))
+    if len(time_split) == 2:
+        minutes = 0
+        seconds = int(time_split[0])
+        millis = int(time_split[1])
+    if len(time_split) == 3:
+        minutes = int(time_split[0])
+        seconds = int(time_split[1])
+        millis = int(time_split[2])
+    ticks = ((minutes * 60000) + (seconds * 1000) + millis) / 15
     return int(ticks)
 
 
@@ -151,4 +160,4 @@ def convert_to_human_time(input_ticks):
     ms = int(input_ticks) * 15
     seconds, ms = divmod(ms, 1000)
     minutes, seconds = divmod(seconds, 60)
-    return f'{int(minutes):02d}:{int(seconds):02d}:{int(ms):03d}'
+    return f'{int(minutes):02d}:{int(seconds):02d}.{int(ms):03d}'
