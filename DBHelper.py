@@ -331,7 +331,6 @@ class DBHelper:
         df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
         df.Ticks = df.Ticks.round(decimals=0)
         df = df.nsmallest(10, 'Place')  # Top 5 Runs
-        print(df)
         columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks']
 
         # Using plotly to generate table and subsequent image
@@ -371,8 +370,6 @@ class DBHelper:
         df = df[df['Category'] == category]
         playerID = df['SRCID'].loc[df.index[0]]
         playerName = df['RunnerName'].loc[df.index[0]]
-        print(playerID)
-        print(playerName)
         df = df.drop('RunnerNameLower', 1)
         df = df.drop('RunnerName', 1)
         df = df.drop('SRCID', 1)
@@ -389,7 +386,6 @@ class DBHelper:
         df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
         df.Ticks = df.Ticks.round(decimals=0)
         df = df.nsmallest(10, 'Place')  # Top 5 Runs
-        print(df)
         columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks']
 
         # Using plotly to generate table and subsequent image
@@ -458,7 +454,6 @@ class DBHelper:
         numQuery = numQuery.sort_values('Chamber')
 
         df = pandas.concat([numQuery, escQuery, advQuery])
-        print(df)
         columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks']
 
         # Using plotly to generate table and subsequent image
@@ -510,7 +505,6 @@ class DBHelper:
         df.Time = df.Time.round(decimals=3)
         df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
         df.Ticks = df.Ticks.round(decimals=0)
-        print(df)
         columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks', 'Date']
 
         # Using plotly to generate table and subsequent image
@@ -563,7 +557,6 @@ class DBHelper:
         df.Time = df.Time.round(decimals=3)
         df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
         df.Ticks = df.Ticks.round(decimals=0)
-        print(df)
         columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks', 'Date']
 
         # Using plotly to generate table and subsequent image
@@ -727,9 +720,10 @@ class DBHelper:
                         df = df.round(decimals=2)
                         df = df[df['RunnerName'] == playerName]  # Only Player Row
                         # TODO if df what do you mean by this?? ^lun
-                        cPlace = df['Ranking'].loc[df.index[0]]  # Gets Cat Place
-                        cPoints = df['Points'].loc[df.index[0]]  # Gets Cat Place
-                        catRanks = catRanks + f',{cat},{cPlace},{cPoints}'
+                        cPlace = (df['Ranking'].loc[df.index[0]])  # Gets Cat Place
+                        cPoints = (df['Points'].loc[df.index[0]])  # Gets Cat Place
+                        cat = cat.replace("_", " ")
+                        catRanks = catRanks + f',{cat},{cPlace:.0f},{cPoints:.2f}'
 
                     except:
                         missingCats += 1
@@ -738,7 +732,7 @@ class DBHelper:
                 if missingCats >= 3:
                     return "Error: Invalid Category"
 
-                returnArray = [str(f'{oPlace},{oPoints}'), str(catRanks), playerID, playerName]
+                returnArray = [str(f'{oPlace:.0f},{oPoints:.2f}'), str(catRanks), playerID, playerName]
                 return returnArray
 
             elif len(userMessage) == 2:
@@ -749,34 +743,32 @@ class DBHelper:
                     category = self.inputToCategory(category)
 
                     nameID = self.exportPlayerProfileDefault(playerName)
-                    print(category)
                     cat = category.replace(" ", "_")
                     playerName = nameID[1]
                     playerID = nameID[0]
-                    print("two")
                     self.exportPlayerProfileCategory(playerName, cat)
 
                     df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", self.conn)
                     df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                     df = df.sort_values('Points', ascending=False)  # Sorts by Points
                     df = df.round(decimals=2)
-                    print("three")
                     df["Ranking"] = df["Points"].rank(method='min',ascending=False)
                     df = df[df['RunnerName'] == playerName]  # Only Player Row
                     cPlace = df['Ranking'].loc[df.index[0]]  # Gets Cat Place
                     cPoints = df['Points'].loc[df.index[0]]  # Gets Cat Place
-                    print("four")
-                    returnArray = [str(f',{category},{cPlace},{cPoints}'), playerID, playerName]
+                    category = category.replace("_", " ")
+                    
+                    returnArray = [str(f',{category},{cPlace:.0f},{cPoints:.2f}'), playerID, playerName]
                     print(returnArray)
                     return returnArray
 
                 except Error:
                     return 'Error fetching data from database.'
 
-            elif len(userMessage) == 4:
+            elif len(userMessage) == 3:
                 try:
-                    playerName = str(userMessage[1])
-                    category = str(userMessage[2])
+                    playerName = str(userMessage[0])
+                    category = str(userMessage[1])
                     category = self.inputToCategory(category)
                     missingCats = 0
 
@@ -798,7 +790,8 @@ class DBHelper:
                     cPlace = df['Ranking'].loc[df.index[0]]  # Gets Cat Place
                     cPoints = df['Points'].loc[df.index[0]]  # Gets Cat Place
 
-                    returnArray = [str(f',{category},{cPlace},{cPoints}'), playerID, playerName]
+                    
+                    returnArray = [str(f',{category},{cPlace:.0f},{cPoints:.2f}'), playerID, playerName]
                     print(returnArray)
                     return returnArray
 
