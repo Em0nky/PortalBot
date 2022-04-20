@@ -13,7 +13,7 @@ async def on_command(event, args):
                             '`!levelboard` - Display a particular level leaderboard\n' \
                             '`!profile` - Get different information of a specific runner\n' \
                             '`!recent` - Get the 10 most recent IL runs from a runner\n' \
-                            '`!run` - Get a specific IL run from runner\n\n' \
+                            '`!run` - Get a specific IL run from runner\n' \
                             '`!convert` - Convert between time and ticks\n\n' \
                             '» For help for a specific command use `!help [command]`'
 
@@ -113,6 +113,8 @@ async def on_command(event, args):
             embed.add_field(name="!recent [ticks]",
                             value="This converts engine ticks to time.",
                             inline=False)
+
+            await event.channel.send(embed=embed)
 
         else:
 
