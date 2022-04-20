@@ -12,9 +12,9 @@ async def on_command(event, args):
                             '`!leaderboard` - Display a particular leaderboard\n' \
                             '`!levelboard` - Display a particular level leaderboard\n' \
                             '`!profile` - Get different information of a specific runner\n' \
+                            '`!convert` - Convert between time and ticks\n' \
                             '`!recent` - Get the 10 most recent IL runs from a runner\n' \
-                            '`!run` - Get a specific IL run from runner\n' \
-                            '`!convert` - Convert between time and ticks\n\n' \
+                            '`!run` - Get a specific IL run from runner\n\n' \
                             '» For help for a specific command use `!help [command]`'
 
         await event.channel.send(embed=embed)
@@ -107,10 +107,10 @@ async def on_command(event, args):
             embed.__setattr__('color', 0x00ffff)
             embed.title = 'Help: !convert Command'
             embed = discord.Embed()
-            embed.add_field(name="!recent [time]",
+            embed.add_field(name="!convert [time]",
                             value="This converts time to engine ticks.",
                             inline=False)
-            embed.add_field(name="!recent [ticks]",
+            embed.add_field(name="!convert [ticks]",
                             value="This converts engine ticks to time.",
                             inline=False)
 
