@@ -14,6 +14,7 @@ async def on_command(event, args):
                             '`!profile` - Get different information of a specific runner\n' \
                             '`!recent` - Get the 10 most recent IL runs from a runner\n' \
                             '`!run` - Get a specific IL run from runner\n\n' \
+                            '`!convert` - Convert between time and ticks\n\n' \
                             '» For help for a specific command use `!help [command]`'
 
         await event.channel.send(embed=embed)
@@ -99,6 +100,19 @@ async def on_command(event, args):
                             inline=False)
 
             await event.channel.send(embed=embed)
+
+        elif args[0].lower() == "convert":
+
+            embed = discord.Embed()
+            embed.__setattr__('color', 0x00ffff)
+            embed.title = 'Help: !convert Command'
+            embed = discord.Embed()
+            embed.add_field(name="!recent [time]",
+                            value="This converts time to engine ticks.",
+                            inline=False)
+            embed.add_field(name="!recent [ticks]",
+                            value="This converts engine ticks to time.",
+                            inline=False)
 
         else:
 
