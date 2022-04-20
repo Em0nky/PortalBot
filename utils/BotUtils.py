@@ -142,17 +142,20 @@ def convert_to_ticks(input_str):
     millis = ''
     time_override = input_str.replace(':', '#').replace('.', '#')
     time_split = time_override.split('#')
-    print(len(time_split))
+
     if len(time_split) == 2:
         minutes = 0
         seconds = int(time_split[0])
         millis = int(time_split[1])
+
     if len(time_split) == 3:
         minutes = int(time_split[0])
         seconds = int(time_split[1])
         millis = int(time_split[2])
+
     ticks = ((minutes * 60000) + (seconds * 1000) + millis) / 15
-    return int(ticks)
+
+    return ticks
 
 
 def convert_to_human_time(input_ticks):
