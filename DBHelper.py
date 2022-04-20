@@ -45,7 +45,8 @@ class DBHelper:
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
-        df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+        df["Ranking"] = df["Points"].rank(method='min',ascending=False)
+
         df = df.nsmallest(10, 'Ranking')  # Only Top 10 Players
 
         # Using plotly to generate table and subsequent image
@@ -83,7 +84,8 @@ class DBHelper:
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
-        df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+        df["Ranking"] = df["Points"].rank(method='min',ascending=False)
+
         df = df.nsmallest(boardLength, 'Ranking')  # Only Top 10 Players
 
         # Using plotly to generate table and subsequent image
@@ -115,8 +117,8 @@ class DBHelper:
 
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
-
-        df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+        
+        df["Ranking"] = df["Points"].rank(method='min',ascending=False)
 
         # Using plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
@@ -155,7 +157,7 @@ class DBHelper:
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
-        df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+        df["Ranking"] = df["Points"].rank(method='min',ascending=False)
         df = df.nsmallest(10, 'Ranking')  # Only Top 10 Players
 
         # Using plotly to generate table and subsequent image
@@ -195,7 +197,7 @@ class DBHelper:
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
-        df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+        df["Ranking"] = df["Points"].rank(method='min',ascending=False)
         df = df.nsmallest(boardLength, 'Ranking')  # Top Number Runners
 
         # Uses plotly to generate table and subsequent image
@@ -230,7 +232,7 @@ class DBHelper:
         df = df.sort_values('Points', ascending=False)
         df = df.round(decimals=2)
 
-        df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+        df["Ranking"] = df["Points"].rank(method='min',ascending=False)
 
         # Uses plotly to generate table and subsequent image
         fig = pgo.Figure(data=[pgo.Table(
@@ -710,7 +712,7 @@ class DBHelper:
                 df = pandas.read_sql_query("SELECT * FROM Overall_Runner_Board;", self.conn)
                 df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                 df = df.sort_values('Points', ascending=False)  # Sorts by Points
-                df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+                df["Ranking"] = df["Points"].rank(method='min',ascending=False)
                 df = df.round(decimals=2)
                 df = df[df['RunnerName'] == playerName]  # Only Player Row
                 oPlace = df['Ranking'].loc[df.index[0]]  # Gets Overall Place
@@ -721,7 +723,7 @@ class DBHelper:
                         df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", self.conn)
                         df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                         df = df.sort_values('Points', ascending=False)  # Sorts by Points
-                        df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+                        df["Ranking"] = df["Points"].rank(method='min',ascending=False)
                         df = df.round(decimals=2)
                         df = df[df['RunnerName'] == playerName]  # Only Player Row
                         # TODO if df what do you mean by this?? ^lun
@@ -759,7 +761,7 @@ class DBHelper:
                     df = df.sort_values('Points', ascending=False)  # Sorts by Points
                     df = df.round(decimals=2)
                     print("three")
-                    df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+                    df["Ranking"] = df["Points"].rank(method='min',ascending=False)
                     df = df[df['RunnerName'] == playerName]  # Only Player Row
                     cPlace = df['Ranking'].loc[df.index[0]]  # Gets Cat Place
                     cPoints = df['Points'].loc[df.index[0]]  # Gets Cat Place
@@ -791,7 +793,7 @@ class DBHelper:
                     df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                     df = df.sort_values('Points', ascending=False)  # Sorts by Points
                     df = df.round(decimals=2)
-                    df['Ranking'] = range(1, len(df) + 1)  # Adds Ranking Column
+                    df["Ranking"] = df["Points"].rank(method='min',ascending=False)
                     df = df[df['RunnerName'] == playerName]  # Only Player Row
                     cPlace = df['Ranking'].loc[df.index[0]]  # Gets Cat Place
                     cPoints = df['Points'].loc[df.index[0]]  # Gets Cat Place
