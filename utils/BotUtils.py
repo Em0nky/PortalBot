@@ -12,92 +12,50 @@ def input_to_category(category):
     """Takes input and converts it to correctly formatted category name"""
 
     match category.lower():
-        case 'inbob' | 'inbounds' | 'i': return 'Inbounds'
-        case 'oob' | 'o': return 'Out of Bounds'
-        case 'gless' | 'glitchless' | 'g': return 'Glitchless'
-        case _: return None
+        case 'inbob' | 'inbounds' | 'i':
+            return 'Inbounds'
+        case 'oob' | 'o':
+            return 'Out of Bounds'
+        case 'gless' | 'glitchless' | 'g':
+            return 'Glitchless'
+        case _:
+            return None
 
 
 def input_to_chamber(chamber):
     """Takes input and converts it to correctly formatted chamber name"""
 
-    chamber = chamber.replace('-', '').replace('/', '')
+    chamber = chamber.replace('-', '').replace('/', '').replace('anced', '')
 
-    if chamber == '10':
-        return level_list[6]  # 10
-    else:
-        userChamber = chamber.replace('0', '')
+    if not chamber == '10':
+        chamber = chamber.replace('0', '')
 
-    match chamber:
+    match chamber.lower():
+        case '' | '1': return level_list[0]
+        case '23' | '2' | '3': return level_list[1]
+        case '45' | '4' | '5': return level_list[2]
+        case '67' | '6' | '7': return level_list[3]
+        case '8': return level_list[4]
+        case '9': return level_list[5]
         case '10': return level_list[6]
-
-
-    if chamber == '10':
-        return level_list[6]  # 10
-    else:
-        userChamber = chamber.replace('0', '')
-
-    if 'adv' in userChamber:
-        chamber = userChamber.replace('anced', '')
-
-        if chamber == 'adv13':
-            return level_list[18]  # adv13
-        elif chamber == 'adv14':
-            return level_list[19]  # adv14
-        elif chamber == 'adv15':
-            return level_list[20]  # adv15
-        elif chamber == 'adv16':
-            return level_list[21]  # adv16
-        elif chamber == 'adv17':
-            return level_list[22]  # adv17
-        elif chamber == 'adv18':
-            return level_list[23]  # adv18
-        else:
-            return ''
-
-    elif 'e' in chamber:
-        if chamber == 'e':
-            return level_list[15]  # e00
-        elif chamber == 'e1':
-            return level_list[16]  # e01
-        elif chamber == 'e2':
-            return level_list[17]  # e02
-        else:
-            return ''
-
-    else:
-        if userChamber == '' or userChamber == '1' or userChamber.lower() == "owo":
-            return level_list[0]  # 00-01
-        elif userChamber == '23' or userChamber == '2' or userChamber == '3':
-            return level_list[1]  # 02-03
-        elif userChamber == '45' or userChamber == '4' or userChamber == '5':
-            return level_list[2]  # 04-05
-        elif userChamber == '67' or userChamber == '6' or userChamber == '7':
-            return level_list[3]  # 06-07
-        elif userChamber == '8':
-            return level_list[4]  # 08
-        elif userChamber == '9':
-            return level_list[5]  # 09
-        elif userChamber == '1112' or userChamber == '11' or userChamber == '12':
-            return level_list[7]  # 11-12
-        elif userChamber == '13':
-            return level_list[8]  # 13
-        elif userChamber == '14':
-            return level_list[9]  # 14
-        elif userChamber == '15':
-            return level_list[10]  # 15
-        elif userChamber == '16':
-            return level_list[11]  # 16
-        elif userChamber == '17':
-            return level_list[12]  # 17
-        elif userChamber == '18':
-            return level_list[13]  # 18
-        elif userChamber == '19':
-            return level_list[14]  # 19
-        elif userChamber == '10':
-            pass
-        else:
-            return ''
+        case '1112' | '11' | '12': return level_list[7]
+        case '13': return level_list[8]
+        case '14': return level_list[9]
+        case '15': return level_list[10]
+        case '16': return level_list[11]
+        case '17': return level_list[12]
+        case '18': return level_list[13]
+        case '19': return level_list[14]
+        case 'e': return level_list[15]
+        case 'e1': return level_list[16]
+        case 'e2': return level_list[17]
+        case 'adv13': return level_list[18]
+        case 'adv14': return level_list[19]
+        case 'adv15': return level_list[20]
+        case 'adv16': return level_list[21]
+        case 'adv17': return level_list[22]
+        case 'adv18': return level_list[23]
+        case _: return None
 
 
 def embedRun(runInfo):

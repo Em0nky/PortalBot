@@ -91,7 +91,6 @@ async def on_command(event, args):
             embed = discord.Embed()
             embed.__setattr__('color', 0x00ffff)
             embed.title = 'Help: !recent Command'
-            embed = discord.Embed()
             embed.add_field(name="!recent [player]",
                             value="This returns [player]'s 10 most recent ILs.",
                             inline=False)
@@ -106,7 +105,6 @@ async def on_command(event, args):
             embed = discord.Embed()
             embed.__setattr__('color', 0x00ffff)
             embed.title = 'Help: !convert Command'
-            embed = discord.Embed()
             embed.add_field(name="!convert [time]",
                             value="This converts time to engine ticks.",
                             inline=False)
@@ -119,7 +117,3 @@ async def on_command(event, args):
         else:
 
             await event.channel.send('Command not found')
-
-
-class HelpCommand:
-    pass

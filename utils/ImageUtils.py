@@ -40,7 +40,7 @@ def export_leaderboard_image(board_length=10, category='Overall', level='Runner_
         table_columns = [1, 2, 3, 4, 5]
         table_width = [25, 60, 40, 40, 40]
         table_header = list(['Place', 'Player', 'Points', 'Time', 'Ticks'])
-        table_cells = [df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks]
+        table_cells = [df.Place, df.Player, df.Points, df.Time, df.Ticks]
 
     # Using plotly to generate table and subsequent image
     fig = pgo.Figure(data=[pgo.Table(

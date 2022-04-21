@@ -5,6 +5,14 @@ import DBHelper
 
 async def on_command(event, args):
 
+    if len(args) == 0:
+        pass
+
+    if len(args) == 1:
+
+        player = args[0]
+
+
     try:
 
         recentCreated = DBHelper.recentCommand(args)

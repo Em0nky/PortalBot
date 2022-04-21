@@ -6,7 +6,6 @@ import plotly.graph_objects as pgo
 import plotly.io as pio
 from PIL import Image
 
-from DBUpdate import catList
 from utils import ImageUtils, BotUtils
 
 file = "PointsDB.db"
@@ -174,11 +173,11 @@ def exportPlayerProfileCategoryAll(self, player, category):
     return [playerID, playerName]
 
 
-def exportPlayerProfileDefaultDate(self, player):
+def exportPlayerProfileDefaultDate(player):
     pio.kaleido.scope.default_scale = 2.0
     player = player.lower()
 
-    df = pandas.read_sql_query(f"SELECT * FROM runs;", self.conn)
+    df = pandas.read_sql_query(f"SELECT * FROM runs;", get_connection())
     df['RunnerNameLower'] = df['RunnerName'].str.lower()
     df = df[df['RunnerNameLower'] == player]
     playerName = df['RunnerName'].loc[df.index[0]]
@@ -277,31 +276,6 @@ def exportPlayerProfileCategoryDate(self, player, category):
     return [playerName]
 
 
-def levelboardCommand(userMessage):
-    """Command used for the bot to make level leaderboards
-    Includes required specification of category and chamber"""
-
-    category = userMessage[0].lower()
-    level = userMessage[1]
-    if len(userMessage) == 3:
-        level = (userMessage[1] + userMessage[2]).replace(' ', '')
-
-    category = BotUtils.inputToCategory(category)
-    level = BotUtils.input_to_chamber(level)
-
-    if category == '':
-        return "Error: Category not found."
-    elif level == '':
-        return "Error: Chamber not found."
-    else:
-        # self.exportChamberPointsLeaderboardImage(category, level)
-        ImageUtils.export_leaderboard_image(category=category, level=level)
-        replacement = '/'
-        if level.lower().startswith('adv'):
-            replacement = ' '
-        return f"**{category} {level.replace('_', replacement)} Leaderboard:**"
-
-
 def userprofileCommand(userMessage):
     """Command used for the bot to make a user profile
     !Profile
@@ -345,7 +319,7 @@ def userprofileCommand(userMessage):
             oPlace = df['Ranking'].loc[df.index[0]]  # Gets Overall Place
             oPoints = df['Points'].loc[df.index[0]]  # Gets Overall Place
 
-            for cat in catList:
+            for cat in BotUtils.category_list:
                 try:
                     df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", get_connection())
                     df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
