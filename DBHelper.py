@@ -277,78 +277,6 @@ def exportPlayerProfileCategoryDate(self, player, category):
     return [playerName]
 
 
-def leaderboardCommand(userMessage):
-    """
-    Command used for the bot to make overall points leaderboards
-    Includes specification of category, length, and of both category and length
-    """
-
-    if len(userMessage) == 1:
-
-        # !Leaderboard [NUMBER] creates specified length leaderboard
-        if userMessage[0].isnumeric():  # numeric leaderboard requests(i.e. 15, 100)
-            boardLength = int(userMessage[0])
-
-            # If board length is less than 300 but more than 0
-            if 300 > boardLength > 0:
-                try:
-
-                    # self.exportPointsLeaderboardImage(boardLength)
-                    ImageUtils.export_leaderboard_image(board_length=boardLength)
-                    return f"Top {boardLength} Overall Players"
-
-                except Error:
-                    return "Error fetching data from database."
-            else:
-                return "Error: Invalid leaderboard length."
-
-        else:  # Non-numeric leaderboard requests(i.e. max, inbounds, oob)
-            # !Leaderboard max creates whole leaderboard
-            if userMessage[0].lower() == "max":
-                try:
-                    ImageUtils.export_leaderboard_image(board_length=-1)
-                    return "All Players Overall"
-                except Error:
-                    return "Error fetching data from database."
-
-            else:
-                category = BotUtils.inputToCategory(userMessage[0])
-                if category == '':
-                    return "catfail"
-
-                # self.exportCatPointsLeaderboardImageDefault(category)
-                ImageUtils.export_leaderboard_image(category=category)
-
-                return f"Top {category} Players"
-
-    # Leaderboard [CATEGORY] [NUMBER] creates a specific category leaderboard of specific length
-    elif len(userMessage) == 2:
-        try:
-
-            category = BotUtils.inputToCategory(userMessage[0])
-
-            boardLength = -1
-            if not userMessage[1].lower() == "max":
-                boardLength = int(userMessage[1])
-
-            ImageUtils.export_leaderboard_image(category=category, board_length=boardLength)
-            # self.exportCatPointsLeaderboardImage(category, boardLength)
-            return f"Top {boardLength if not boardLength == -1 else ''} {category} Players"
-
-        except Error:
-            return "Error fetching data from database."
-
-    else:
-        try:
-            # !Leaderboard creates default length (10) leaderboard
-            # self.exportPointsLeaderboardImageDefault()
-            ImageUtils.export_leaderboard_image()
-            return f"Top Overall Players"
-
-        except Error:
-            return "Error fetching data from database."
-
-
 def levelboardCommand(userMessage):
     """Command used for the bot to make level leaderboards
     Includes required specification of category and chamber"""
@@ -596,3 +524,5 @@ def recentCommand(self, userMessage):
             playerName = self.exportPlayerProfileCategoryDate(player, category)
             playerName = playerName[0]
             return [playerName, category]
+        except:
+            print('balls')

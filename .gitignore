@@ -2,4 +2,5 @@ botToken.txt
 PointsDB.db
 runList.csv
 userList.csv
+/venv/
 list.png

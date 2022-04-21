@@ -1,9 +1,6 @@
-import datetime
 import time
 
 import discord
-
-import DBHelper
 
 category_list = ["Inbounds", "Out_of_Bounds", "Glitchless"]
 level_list = ["00_01", "02_03", "04_05", "06_07", "08", "09", "10",
@@ -11,28 +8,29 @@ level_list = ["00_01", "02_03", "04_05", "06_07", "08", "09", "10",
               "Adv_13", "Adv_14", "Adv_15", "Adv_16", "Adv_17", "Adv_18"]
 
 
-def inputToCategory(userCategory):
+def input_to_category(category):
     """Takes input and converts it to correctly formatted category name"""
 
-    userCategory = userCategory.lower()
-
-    if userCategory == "inbob" or userCategory == "inbounds" or userCategory == "i":
-        return "Inbounds"
-
-    elif userCategory == "oob" or userCategory == "o":
-        return "Out of Bounds"
-
-    elif userCategory == "gless" or userCategory == "glitchless" or userCategory == "g":
-        return "Glitchless"
-
-    else:
-        return ""
+    match category.lower():
+        case 'inbob' | 'inbounds' | 'i': return 'Inbounds'
+        case 'oob' | 'o': return 'Out of Bounds'
+        case 'gless' | 'glitchless' | 'g': return 'Glitchless'
+        case _: return None
 
 
 def input_to_chamber(chamber):
     """Takes input and converts it to correctly formatted chamber name"""
-    chamber = chamber.replace('/', '')
-    chamber = chamber.replace('-', '')
+
+    chamber = chamber.replace('-', '').replace('/', '')
+
+    if chamber == '10':
+        return level_list[6]  # 10
+    else:
+        userChamber = chamber.replace('0', '')
+
+    match chamber:
+        case '10': return level_list[6]
+
 
     if chamber == '10':
         return level_list[6]  # 10
