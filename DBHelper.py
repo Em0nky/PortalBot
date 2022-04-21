@@ -596,6 +596,3 @@ def recentCommand(self, userMessage):
             playerName = self.exportPlayerProfileCategoryDate(player, category)
             playerName = playerName[0]
             return [playerName, category]
-
-        except Error:
-            return 'fail'

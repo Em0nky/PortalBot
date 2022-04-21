@@ -9,15 +9,23 @@ async def on_command(event, args):
 
                 ticks = BotUtils.convert_to_ticks(args[0])
 
-                if not ((ticks * 15) % 15) == 0:
+                if not (ticks % 1) == 0:
+                    newTicks = ticks
                     ticks = str(int(ticks)) + '*'
+
+                    if (newTicks % 1) < .4:
+                        newTicks = int(newTicks)
+                    elif (newTicks % 1) > .4:
+                        newTicks = int(newTicks + 1)
+                    await event.channel.send(f'Converted ticks `{str(ticks)}` | Did you mean `{BotUtils.convert_to_human_time(newTicks)}` instead?')
+
                 else:
                     ticks = int(ticks)
-                await event.channel.send('Converted ticks `' + str(ticks) + "`")
+                    await event.channel.send(f'Converted ticks `{str(ticks)}`')
 
             except ValueError:
-                await event.channel.send('Invalid time format given.')
+                await event.channel.send(f'Invalid time format given.')
 
         else:
             time = BotUtils.convert_to_human_time(args[0])
-            await event.channel.send('Converted time `' + str(time) + '`')
+            await event.channel.send(f'Converted time `{str(time)}`')
