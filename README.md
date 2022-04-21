@@ -15,5 +15,3 @@ Discord Permissions: ``Read Messages/View Channels`` ``Send Messages`` ``Embed L
 | !recent                        | Get the 10 most recent IL runs from a runner |
 | !run                           | Get a specific IL run from a runner          |
 
-# Credits
-TBD
