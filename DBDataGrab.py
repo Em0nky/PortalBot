@@ -212,7 +212,7 @@ pp = PortalPoints()
 
 uList = pp.createAllCatPointsList()
 
-with open('userList.csv', 'w') as f:
+with open('userList.csv', 'w', encoding='utf-8') as f:
     write = csv.writer(f)
     write.writerows(uList)
 
@@ -220,6 +220,6 @@ rList = [["Category", "Chamber", "Place", "RunnerName", "SRCID", "Time", "Ticks"
 rList.extend(pp.createAllRuns())
 
 
-with open('runList.csv', 'w') as f:
+with open('runList.csv', 'w', encoding='utf-8') as f:
     write = csv.writer(f)
     write.writerows(rList)
