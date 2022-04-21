@@ -6,11 +6,10 @@ import plotly.graph_objects as pgo
 import plotly.io as pio
 from PIL import Image
 
+from DBUpdate import catList
+from utils import ImageUtils, BotUtils
+
 file = "PointsDB.db"
-catList = ["Inbounds", "Out_of_Bounds", "Glitchless"]
-chamberList = ["00_01", "02_03", "04_05", "06_07", "08", "09", "10",
-               "11_12", "13", "14", "15", "16", "17", "18", "19", "e00", "e01", "e02",
-               "Adv_13", "Adv_14", "Adv_15", "Adv_16", "Adv_17", "Adv_18"]
 
 
 def get_connection():
@@ -26,76 +25,20 @@ def get_connection():
     return conn
 
 
-def export_leaderboard_image(board_length=10, category='Overall', level='Runner_Board'):
-    """
-    Translate database information into the pictures and other stuff
-    if boardLength is -1, it's max
-    """
+def leaderboard_max_length(category='Overall', level='Runner_Board'):
 
     df = pandas.read_sql_query(f"SELECT * FROM {category.replace(' ', '_')}_{level};", get_connection())
-    df = df.drop('SRCID', 1)
-    if not level == 'Runner_Board':
-        df = df.drop('SRCID', 1)
-        df = df.drop('Category', 1)
-        df = df.drop('Chamber', 1)
-        df = df.drop('Date', 1)
-        df = df.drop('Link', 1)
-        df = df.drop('VideoLink', 1)
-        df = df.drop('Ticks', 1)
-    df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
-    df.rename(columns={'RunnerName': 'Player'}, inplace=True)
-    df = df.sort_values('Points', ascending=False)
-    df = df.round(decimals=2)
-    df["Ranking"] = df["Points"].rank(method='min', ascending=False)
-    if board_length == -1:
-        board_length = len(df)
-    df = df.nsmallest(board_length, 'Ranking')
-
-    table_columns = [2, 3, 1]
-    table_width = [50, 40, 25]
-    table_header = list(df.columns)
-    table_cells = [df.Player, df.Points, df.Ranking]
-    if not level == 'Runner_Board':
-        table_columns = [1, 2, 3, 4, 5]
-        table_width = [25, 60, 40, 40, 40]
-        table_header = list(['Place', 'Player', 'Points', 'Time', 'Ticks'])
-
-    # Using plotly to generate table and subsequent image
-    fig = pgo.Figure(data=[pgo.Table(
-
-        columnorder=table_columns,
-        columnwidth=table_width,
-        header=dict(values=table_header,
-                    fill_color='#1b1b1b',
-                    font=dict(color='white', size=12),
-                    align='left'),
-        cells=dict(values=table_cells,
-                   fill_color='#D3D3D3',
-                   align='left'))
-    ])
-
-    # Modifies Table height according to board length
-
-    heightMult = (20 * board_length) + 300
-    pio.kaleido.scope.default_scale = 2.0
-    pio.kaleido.scope.default_height = heightMult
-    fig.write_image("list.png")
-
-    # Cropping the plotly image
-    listimg = Image.open("list.png")
-    listimg = listimg.crop((160, 200, 1240, (heightMult * 2) - 345))
-    listimg.save("list.png")
+    return len(df)
 
 
-def export_profile_image(player, board_length=10, category=None):
+def exportPlayerProfileDefault(player):
+
     pio.kaleido.scope.default_scale = 2.0
     player = player.lower()
 
     df = pandas.read_sql_query(f"SELECT * FROM runs;", get_connection())
     df['RunnerNameLower'] = df['RunnerName'].str.lower()
     df = df[df['RunnerNameLower'] == player]
-    if category is None:
-        df = df[df['Category'] == category]
     playerID = df['SRCID'].loc[df.index[0]]
     playerName = df['RunnerName'].loc[df.index[0]]
     df = df.drop('RunnerNameLower', 1)
@@ -104,39 +47,8 @@ def export_profile_image(player, board_length=10, category=None):
     df = df.drop('Link', 1)
     df = df.drop('VideoLink', 1)
     df = df.drop('Date', 1)
-    df = df.drop('Ticks', 1)
-    df['Chamber'] = df['Chamber'].str.replace("_", " ")
-    df['Category'] = df['Category'].str.replace("_", " ")
+    df.drop('Ticks', 1)
 
-    df = df.sort_values('Points', ascending=False)
-    df.Points = df.Points.round(decimals=2)
-    df.Time = df.Time.round(decimals=3)
-    df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
-    df.Ticks = df.Ticks.round(decimals=0)
-    df = df.nsmallest(10, 'Place')  # Top 5 Runs
-    columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks']
-
-    # Using plotly to generate table and subsequent image
-    fig = pgo.Figure(data=[pgo.Table(
-        columnorder=[0, 1, 2, 3, 4, 5],
-        columnwidth=[25, 25, 15, 15, 25, 20],
-        header=dict(values=list(columnHeaders),
-                    fill_color='#1b1b1b',
-                    font=dict(color='white', size=12),
-                    align='left'),
-        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
-                   fill_color='#D3D3D3',
-                   align='left'))
-    ])
-    boardLength = len(df)
-    heightMult = (20 * boardLength) + 300
-    pio.kaleido.scope.default_height = heightMult
-    fig.write_image("list.png")
-
-    # Cropping the plotly image
-    listimg = Image.open("list.png")
-    listimg = listimg.crop((160, 200, 1240, (heightMult * 2) - 345))
-    listimg.save("list.png")
     return [playerID, playerName]
 
 
@@ -382,7 +294,7 @@ def leaderboardCommand(userMessage):
                 try:
 
                     # self.exportPointsLeaderboardImage(boardLength)
-                    export_leaderboard_image(board_length=boardLength)
+                    ImageUtils.export_leaderboard_image(board_length=boardLength)
                     return f"Top {boardLength} Overall Players"
 
                 except Error:
@@ -394,18 +306,18 @@ def leaderboardCommand(userMessage):
             # !Leaderboard max creates whole leaderboard
             if userMessage[0].lower() == "max":
                 try:
-                    export_leaderboard_image(board_length=-1)
+                    ImageUtils.export_leaderboard_image(board_length=-1)
                     return "All Players Overall"
                 except Error:
                     return "Error fetching data from database."
 
             else:
-                category = inputToCategory(userMessage[0])
+                category = BotUtils.inputToCategory(userMessage[0])
                 if category == '':
                     return "catfail"
 
                 # self.exportCatPointsLeaderboardImageDefault(category)
-                export_leaderboard_image(category=category)
+                ImageUtils.export_leaderboard_image(category=category)
 
                 return f"Top {category} Players"
 
@@ -413,13 +325,13 @@ def leaderboardCommand(userMessage):
     elif len(userMessage) == 2:
         try:
 
-            category = inputToCategory(userMessage[0])
+            category = BotUtils.inputToCategory(userMessage[0])
 
             boardLength = -1
             if not userMessage[1].lower() == "max":
                 boardLength = int(userMessage[1])
 
-            export_leaderboard_image(category=category, board_length=boardLength)
+            ImageUtils.export_leaderboard_image(category=category, board_length=boardLength)
             # self.exportCatPointsLeaderboardImage(category, boardLength)
             return f"Top {boardLength if not boardLength == -1 else ''} {category} Players"
 
@@ -430,14 +342,14 @@ def leaderboardCommand(userMessage):
         try:
             # !Leaderboard creates default length (10) leaderboard
             # self.exportPointsLeaderboardImageDefault()
-            export_leaderboard_image()
+            ImageUtils.export_leaderboard_image()
             return f"Top Overall Players"
 
         except Error:
             return "Error fetching data from database."
 
 
-def levelboardCommand(self, userMessage):
+def levelboardCommand(userMessage):
     """Command used for the bot to make level leaderboards
     Includes required specification of category and chamber"""
 
@@ -446,22 +358,23 @@ def levelboardCommand(self, userMessage):
     if len(userMessage) == 3:
         level = (userMessage[1] + userMessage[2]).replace(' ', '')
 
-    category = self.inputToCategory(category)
-    level = self.inputToChamber(level)
+    category = BotUtils.inputToCategory(category)
+    level = BotUtils.input_to_chamber(level)
 
     if category == '':
         return "Error: Category not found."
     elif level == '':
         return "Error: Chamber not found."
     else:
-        self.exportChamberPointsLeaderboardImage(category, level)
+        # self.exportChamberPointsLeaderboardImage(category, level)
+        ImageUtils.export_leaderboard_image(category=category, level=level)
         replacement = '/'
         if level.lower().startswith('adv'):
             replacement = ' '
         return f"**{category} {level.replace('_', replacement)} Leaderboard:**"
 
 
-def userprofileCommand(self, userMessage):
+def userprofileCommand(userMessage):
     """Command used for the bot to make a user profile
     !Profile
     Potentially to be added with database to link discord profile with src
@@ -488,13 +401,14 @@ def userprofileCommand(self, userMessage):
         if len(userMessage) == 1:
             playerName = str(userMessage[0])
 
-            nameID = self.exportPlayerProfileDefault(playerName)
+            nameID = exportPlayerProfileDefault(playerName)
+            # nameID = export_profile_image(playerName)
             playerName = nameID[1]
             playerID = nameID[0]
             catRanks = ""
             missingCats = 0
 
-            df = pandas.read_sql_query("SELECT * FROM Overall_Runner_Board;", self.conn)
+            df = pandas.read_sql_query("SELECT * FROM Overall_Runner_Board;", get_connection())
             df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
             df = df.sort_values('Points', ascending=False)  # Sorts by Points
             df["Ranking"] = df["Points"].rank(method='min', ascending=False)
@@ -503,9 +417,9 @@ def userprofileCommand(self, userMessage):
             oPlace = df['Ranking'].loc[df.index[0]]  # Gets Overall Place
             oPoints = df['Points'].loc[df.index[0]]  # Gets Overall Place
 
-            for cat in self.catList:
+            for cat in catList:
                 try:
-                    df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", self.conn)
+                    df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", get_connection())
                     df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                     df = df.sort_values('Points', ascending=False)  # Sorts by Points
                     df["Ranking"] = df["Points"].rank(method='min', ascending=False)
@@ -532,15 +446,17 @@ def userprofileCommand(self, userMessage):
 
                 playerName = str(userMessage[0])
                 category = str(userMessage[1])
-                category = self.inputToCategory(category)
+                category = BotUtils.inputToCategory(category)
 
-                nameID = self.exportPlayerProfileDefault(playerName)
+                nameID = exportPlayerProfileDefault(playerName)
+                # nameID = export_profile_image(playerName)
                 cat = category.replace(" ", "_")
                 playerName = nameID[1]
                 playerID = nameID[0]
-                self.exportPlayerProfileCategory(playerName, cat)
+                exportPlayerProfileCategory(playerName, cat)
+                # export_profile_image(playerName, category=cat)
 
-                df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", self.conn)
+                df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", get_connection())
                 df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                 df = df.sort_values('Points', ascending=False)  # Sorts by Points
                 df = df.round(decimals=2)
@@ -561,19 +477,20 @@ def userprofileCommand(self, userMessage):
             try:
                 playerName = str(userMessage[0])
                 category = str(userMessage[1])
-                category = self.inputToCategory(category)
-                missingCats = 0
+                category = BotUtils.inputToCategory(category)
 
                 if category == '':
                     return "Error: Invalid category"
 
-                nameID = self.exportPlayerProfileDefault(playerName)
+                nameID = exportPlayerProfileDefault(playerName)
+                # nameID = export_profile_image(playerName)
                 playerName = nameID[1]
                 playerID = nameID[0]
 
-                self.exportPlayerProfileCategoryAll(playerName, category)
+                exportPlayerProfileCategoryAll(playerName, category)
+                # export_profile_image(playerName, board_length=-1, category=category)
 
-                df = pandas.read_sql_query(f"SELECT * FROM {category}_Runner_Board;", self.conn)
+                df = pandas.read_sql_query(f"SELECT * FROM {category}_Runner_Board;", get_connection())
                 df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                 df = df.sort_values('Points', ascending=False)  # Sorts by Points
                 df = df.round(decimals=2)
@@ -682,94 +599,3 @@ def recentCommand(self, userMessage):
 
         except Error:
             return 'fail'
-
-
-def inputToCategory(userCategory):
-    """Takes input and converts it to correctly formatted category name"""
-
-    userCategory = userCategory.lower()
-
-    if userCategory == "inbob" or userCategory == "inbounds" or userCategory == "i":
-        return "Inbounds"
-
-    elif userCategory == "oob" or userCategory == "o":
-        return "Out of Bounds"
-
-    elif userCategory == "gless" or userCategory == "glitchless" or userCategory == "g":
-        return "Glitchless"
-
-    else:
-        return ""
-
-
-def inputToChamber(userChamber):
-    """Takes input and converts it to correctly formatted chamber name"""
-    userChamber = userChamber.replace('/', '')
-    userChamber = userChamber.replace('-', '')
-
-    if userChamber == '10':
-        return chamberList[6]  # 10
-    else:
-        userChamber = userChamber.replace('0', '')
-
-    if 'adv' in userChamber:
-        userChamber = userChamber.replace('anced', '')
-
-        if userChamber == 'adv13':
-            return chamberList[18]  # adv13
-        elif userChamber == 'adv14':
-            return chamberList[19]  # adv14
-        elif userChamber == 'adv15':
-            return chamberList[20]  # adv15
-        elif userChamber == 'adv16':
-            return chamberList[21]  # adv16
-        elif userChamber == 'adv17':
-            return chamberList[22]  # adv17
-        elif userChamber == 'adv18':
-            return chamberList[23]  # adv18
-        else:
-            return ''
-
-    elif 'e' in userChamber:
-        if userChamber == 'e':
-            return chamberList[15]  # e00
-        elif userChamber == 'e1':
-            return chamberList[16]  # e01
-        elif userChamber == 'e2':
-            return chamberList[17]  # e02
-        else:
-            return ''
-
-    else:
-        if userChamber == '' or userChamber == '1' or userChamber.lower() == "owo":
-            return chamberList[0]  # 00-01
-        elif userChamber == '23' or userChamber == '2' or userChamber == '3':
-            return chamberList[1]  # 02-03
-        elif userChamber == '45' or userChamber == '4' or userChamber == '5':
-            return chamberList[2]  # 04-05
-        elif userChamber == '67' or userChamber == '6' or userChamber == '7':
-            return chamberList[3]  # 06-07
-        elif userChamber == '8':
-            return chamberList[4]  # 08
-        elif userChamber == '9':
-            return chamberList[5]  # 09
-        elif userChamber == '1112' or userChamber == '11' or userChamber == '12':
-            return chamberList[7]  # 11-12
-        elif userChamber == '13':
-            return chamberList[8]  # 13
-        elif userChamber == '14':
-            return chamberList[9]  # 14
-        elif userChamber == '15':
-            return chamberList[10]  # 15
-        elif userChamber == '16':
-            return chamberList[11]  # 16
-        elif userChamber == '17':
-            return chamberList[12]  # 17
-        elif userChamber == '18':
-            return chamberList[13]  # 18
-        elif userChamber == '19':
-            return chamberList[14]  # 19
-        elif userChamber == '10':
-            pass
-        else:
-            return ''
