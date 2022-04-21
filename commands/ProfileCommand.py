@@ -1,13 +1,12 @@
 import discord
 
-from DBHelper import DBHelper
+import DBHelper
 from utils import BotUtils
 
 
 async def on_command(event, args):
 
-    dbHelper = DBHelper()
-    profile_created = dbHelper.userprofileCommand(args)
+    profile_created = DBHelper.userprofileCommand(args)
 
     if len(profile_created) == 4:
         playerID = str(profile_created[2])

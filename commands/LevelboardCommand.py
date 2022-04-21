@@ -1,6 +1,6 @@
 import discord
 
-from DBHelper import DBHelper
+import DBHelper
 
 
 async def on_command(event, args):
@@ -8,8 +8,7 @@ async def on_command(event, args):
     if len(args) < 2:
         await event.channel.send('Missing arguments: `!help levelboard`')
 
-    dbHelper = DBHelper()
-    board_created = dbHelper.levelboardCommand(args)
+    board_created = DBHelper.levelboardCommand(args)
 
     if board_created.startswith('Error'):
         await event.channel.send(board_created)

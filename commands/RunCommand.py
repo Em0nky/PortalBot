@@ -1,9 +1,8 @@
-from DBHelper import DBHelper
+import DBHelper
 from utils import BotUtils
 
 
 async def on_command(event, args):
-    dbHelper = DBHelper()
 
     if len(args) < 3:
         await event.channel.send('Missing arguments: `!help run`')
@@ -11,7 +10,7 @@ async def on_command(event, args):
 
     if len(args) >= 3:
 
-        runInfo = dbHelper.runCommand(args)
+        runInfo = DBHelper.runCommand(args)
 
         if len(runInfo) == 10:
             embed = BotUtils.embedRun(runInfo)

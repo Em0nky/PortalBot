@@ -1,12 +1,11 @@
 import discord
 
-from DBHelper import DBHelper
+import DBHelper
 
 
 async def on_command(event, args):
 
-    dbHelper = DBHelper()
-    board_created = dbHelper.leaderboardCommand(args)
+    board_created = DBHelper.leaderboardCommand(args)
 
     if board_created.lower().startswith("top") or board_created.lower().startswith("all"):
 

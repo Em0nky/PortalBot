@@ -1,15 +1,13 @@
 import discord
 
-from DBHelper import DBHelper
+import DBHelper
 
 
 async def on_command(event, args):
 
-    dbHelper = DBHelper()
-
     try:
 
-        recentCreated = dbHelper.recentCommand(args)
+        recentCreated = DBHelper.recentCommand(args)
         file = discord.File("list.png")
 
         if len(recentCreated) == 1:

@@ -1,4 +1,3 @@
-from DBHelper import DBHelper
 import discord
 import warnings
 from commands import HelpCommand, RunCommand, LeaderboardCommand, LevelboardCommand, ProfileCommand, RecentCommand, \
@@ -6,8 +5,6 @@ from commands import HelpCommand, RunCommand, LeaderboardCommand, LevelboardComm
 
 # PortalBot V0.3.3
 
-# Points Pre-Setup
-dbHelper = DBHelper()
 client = discord.Client()
 
 # Suppress FutureWarning in console from pandas
