@@ -69,7 +69,7 @@ class PortalPoints:
                 runPlace = (self.portal_runs["Inbounds"][currentChamber].runs[placeCounter]["place"]) #Gets Player Place
                 runTime = currentRun["times"]["primary_t"] #Gets Player Time
                 playerName = ((self.portal_runs["Inbounds"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
-                runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
+                runPoints = self.pointsCalculation(runPlace)
 
                 currentList = ["Inbounds", currentChamber, playerName, runPlace, runPoints, runTime] #Creates single run entry list
 
@@ -93,7 +93,7 @@ class PortalPoints:
                 runPlace = (self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["place"])
                 runTime = currentRun["times"]["primary_t"] #Gets Player Time
                 playerName = ((self.portal_runs["Out of Bounds"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
-                runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
+                runPoints = self.pointsCalculation(runPlace)
 
                 currentList = ["Out of Bounds", currentChamber, playerName, runPlace, runPoints, runTime] #Creates single run entry list
 
@@ -117,7 +117,7 @@ class PortalPoints:
                 runPlace = (self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["place"])
                 runTime = currentRun["times"]["primary_t"] #Gets Player Time
                 playerName = ((self.portal_runs["Glitchless"][currentChamber].runs[placeCounter]["run"].players)[0].name) #Gets Player Name
-                runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
+                runPoints = self.pointsCalculation(runPlace)
 
                 currentList = ["Glitchless", currentChamber, playerName, runPlace, runPoints, runTime] #Creates single run entry list
 
@@ -150,7 +150,7 @@ class PortalPoints:
 
             #playerName = currentRun["players"][0]["uri"] #Not Working Other Way of getting Player Name
             #runTicks = (self.portal_runs[chosenCat][chosenChamber].runs[placeCounter]["run"].ticks) #Supposed to get ticks
-            runPoints = (((50 - (runPlace - 1))**2) / 50) #Calculates Point Value
+            runPoints = self.pointsCalculation(runPlace)
 
             try:
                 runVidLink = currentRun["videos"]["links"][0]["uri"]#[0]["uri"]
@@ -207,6 +207,22 @@ class PortalPoints:
 
         print(fullList)
         return fullList
+
+    def pointsCalculation(self, runPlace):
+        if runPlace > 50:
+            return 0
+
+        linearPoints = 51 - runPlace #Calculates Point Value
+        expPoints = (((50 - (runPlace - 1))**2)/50)
+        expPoints = round(expPoints,2)
+        
+        if expPoints < 1:
+            expPoints = 1
+
+        finalPoints = ((expPoints + linearPoints)/2)
+        finalPoints = round(finalPoints, 2)
+
+        return finalPoints
 
 pp = PortalPoints()
 

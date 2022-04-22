@@ -8,6 +8,7 @@ dataGrabbed = True
 try:
     exec(open('DBDataGrab.py').read())
 except:
+    print("API Failed Somehow, Run it again.")
     dataGrabbed = False
 
 if dataGrabbed:
