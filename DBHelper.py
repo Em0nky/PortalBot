@@ -6,7 +6,7 @@ import plotly.graph_objects as pgo
 import plotly.io as pio
 from PIL import Image
 
-from utils import ImageUtils, BotUtils
+from utils import BotUtils
 
 file = "PointsDB.db"
 
@@ -181,46 +181,7 @@ def exportPlayerProfileDefaultDate(player):
     df['RunnerNameLower'] = df['RunnerName'].str.lower()
     df = df[df['RunnerNameLower'] == player]
     playerName = df['RunnerName'].loc[df.index[0]]
-    df['Date'] = df['Date'].str.replace("_", "-")
-    df['Date'] = pandas.to_datetime(df['Date'], format='%Y-%m-%d')
-    df = df.sort_values(by='Date', ascending=False)
-    df = df.drop('RunnerNameLower', 1)
-    df = df.drop('RunnerName', 1)
-    df = df.drop('SRCID', 1)
-    df = df.drop('Link', 1)
-    df = df.drop('VideoLink', 1)
-    df = df.drop('Ticks', 1)
-    df['Chamber'] = df['Chamber'].str.replace("_", " ")
-    df['Category'] = df['Category'].str.replace("_", " ")
-    df = df.head(10)  # Recent 10 Runs
 
-    df.Points = df.Points.round(decimals=2)
-    df.Time = df.Time.round(decimals=3)
-    df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
-    df.Ticks = df.Ticks.round(decimals=0)
-    columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks', 'Date']
-
-    # Using plotly to generate table and subsequent image
-    fig = pgo.Figure(data=[pgo.Table(
-        columnorder=[0, 1, 2, 3, 4, 5, 6],
-        columnwidth=[25, 20, 15, 15, 15, 15, 20],
-        header=dict(values=list(columnHeaders),
-                    fill_color='#1b1b1b',
-                    font=dict(color='white', size=12),
-                    align='left'),
-        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks, df.Date],
-                   fill_color='#D3D3D3',
-                   align='left'))
-    ])
-    boardLength = len(df)
-    heightMult = (20 * boardLength) + 300
-    pio.kaleido.scope.default_height = heightMult
-    fig.write_image("list.png")
-
-    # Cropping the plotly image
-    listimg = Image.open("list.png")
-    listimg = listimg.crop((160, 200, 1227, (heightMult * 2) - 345))
-    listimg.save("list.png")
     return [playerName]
 
 
@@ -461,7 +422,7 @@ def runCommand(self, userMessage):
         return f'Error: {player} does not have an IL run in {category} {level}'
 
 
-def recentCommand(self, userMessage):
+def recentCommand(userMessage):
     """Command used for the bot to make a list of recent runs
     !recent
     Potentially to be added with database to link discord profile with src
@@ -479,7 +440,7 @@ def recentCommand(self, userMessage):
         # !Recent [PLAYER]
         try:
             player = userMessage[0]
-            playerName = self.exportPlayerProfileDefaultDate(player)
+            playerName = exportPlayerProfileDefaultDate(player)
             return playerName
 
         except Error:
@@ -490,12 +451,12 @@ def recentCommand(self, userMessage):
         try:
 
             player = userMessage[0]
-            category = self.inputToCategory(userMessage[1])
+            category = BotUtils.input_to_category(userMessage[1])
 
             if category == '':
                 return "catfail"
 
-            playerName = self.exportPlayerProfileCategoryDate(player, category)
+            playerName = exportPlayerProfileCategoryDate(player, category)
             playerName = playerName[0]
             return [playerName, category]
         except:

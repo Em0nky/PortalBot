@@ -1,4 +1,5 @@
 import discord
+from discord.ext import commands
 
 
 async def on_command(event, args):

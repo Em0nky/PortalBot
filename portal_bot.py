@@ -1,37 +1,34 @@
 import discord
+from discord.ext import commands
 import warnings
 from commands import HelpCommand, RunCommand, LeaderboardCommand, LevelboardCommand, ProfileCommand, RecentCommand, \
     ConvertCommand
 
 # PortalBot V0.3.3
 
-client = discord.Client()
+client = commands.Bot(command_prefix='!', case_insensitive=True, strip_after_prefix=True)
 
 # Suppress FutureWarning in console from pandas
 warnings.simplefilter(action='ignore', category=FutureWarning)
+# Supress SQLAlchemy related UserWarning in console from pandas
+warnings.simplefilter(action='ignore', category=UserWarning)
 
 
 @client.event
 async def on_ready():
     print('Successfully logged in as {0.user}'.format(client))
 
+    print(client.all_commands)
+
 
 @client.event
 async def on_message(message):
-
     # If message is from bot, don't do anything
     if message.author == client.user:
         return
 
     command = message.content.split(" ")[0].lower()
     args = message.content.split(" ")[1:]
-
-    if message.content.startswith('!'):
-        print(f'{message.author} executed command {message.content}')
-
-    if command.startswith('!help'):
-        await HelpCommand.on_command(message, args)
-        return
 
     # Run Command
     if command.startswith('!run'):
@@ -63,4 +60,5 @@ async def on_message(message):
         await ConvertCommand.on_command(message, args)
         return
 
-client.run(open("botToken.txt", "r").read())
+
+client.run(open("token.txt", "r").read())

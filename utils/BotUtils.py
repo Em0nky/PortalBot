@@ -12,7 +12,7 @@ def input_to_category(category):
     """Takes input and converts it to correctly formatted category name"""
 
     match category.lower():
-        case 'inbob' | 'inbounds' | 'i':
+        case 'inbounds' | 'i':
             return 'Inbounds'
         case 'oob' | 'o':
             return 'Out of Bounds'
@@ -31,31 +31,56 @@ def input_to_chamber(chamber):
         chamber = chamber.replace('0', '')
 
     match chamber.lower():
-        case '' | '1': return level_list[0]
-        case '23' | '2' | '3': return level_list[1]
-        case '45' | '4' | '5': return level_list[2]
-        case '67' | '6' | '7': return level_list[3]
-        case '8': return level_list[4]
-        case '9': return level_list[5]
-        case '10': return level_list[6]
-        case '1112' | '11' | '12': return level_list[7]
-        case '13': return level_list[8]
-        case '14': return level_list[9]
-        case '15': return level_list[10]
-        case '16': return level_list[11]
-        case '17': return level_list[12]
-        case '18': return level_list[13]
-        case '19': return level_list[14]
-        case 'e': return level_list[15]
-        case 'e1': return level_list[16]
-        case 'e2': return level_list[17]
-        case 'adv13': return level_list[18]
-        case 'adv14': return level_list[19]
-        case 'adv15': return level_list[20]
-        case 'adv16': return level_list[21]
-        case 'adv17': return level_list[22]
-        case 'adv18': return level_list[23]
-        case _: return None
+        case '' | '1':
+            return level_list[0]
+        case '23' | '2' | '3':
+            return level_list[1]
+        case '45' | '4' | '5':
+            return level_list[2]
+        case '67' | '6' | '7':
+            return level_list[3]
+        case '8':
+            return level_list[4]
+        case '9':
+            return level_list[5]
+        case '10':
+            return level_list[6]
+        case '1112' | '11' | '12':
+            return level_list[7]
+        case '13':
+            return level_list[8]
+        case '14':
+            return level_list[9]
+        case '15':
+            return level_list[10]
+        case '16':
+            return level_list[11]
+        case '17':
+            return level_list[12]
+        case '18':
+            return level_list[13]
+        case '19':
+            return level_list[14]
+        case 'e':
+            return level_list[15]
+        case 'e1':
+            return level_list[16]
+        case 'e2':
+            return level_list[17]
+        case 'adv13':
+            return level_list[18]
+        case 'adv14':
+            return level_list[19]
+        case 'adv15':
+            return level_list[20]
+        case 'adv16':
+            return level_list[21]
+        case 'adv17':
+            return level_list[22]
+        case 'adv18':
+            return level_list[23]
+        case _:
+            return None
 
 
 def embedRun(runInfo):
@@ -188,30 +213,12 @@ def embedProfile(userMessage, profileCreated, playerID, playerName):
     return embed
 
 
-def convert_to_ticks(input_str):
-    minutes = ''
-    seconds = ''
-    millis = ''
-    time_override = input_str.replace(':', '#').replace('.', '#')
-    time_split = time_override.split('#')
-
-    if len(time_split) == 2:
-        minutes = 0
-        seconds = int(time_split[0])
-        millis = int(time_split[1])
-
-    if len(time_split) == 3:
-        minutes = int(time_split[0])
-        seconds = int(time_split[1])
-        millis = int(time_split[2])
-
-    ticks = ((minutes * 60000) + (seconds * 1000) + millis) / 15
-
-    return ticks
+def convert_to_ticks(millis: int):
+    return millis / 15
 
 
-def convert_to_human_time(input_ticks):
-    ms = int(input_ticks) * 15
+def convert_to_human_time(ticks: int):
+    ms = int(ticks) * 15
     seconds, ms = divmod(ms, 1000)
     minutes, seconds = divmod(seconds, 60)
     return f'{int(minutes):02d}:{int(seconds):02d}.{int(ms):03d}'
