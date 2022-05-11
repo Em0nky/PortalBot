@@ -1,16 +1,15 @@
-import discord
-from discord.ext import commands
+import os
 import warnings
-from commands import HelpCommand, RunCommand, LeaderboardCommand, LevelboardCommand, ProfileCommand, RecentCommand, \
-    ConvertCommand
 
-# PortalBot V0.3.3
+from discord.ext import commands
 
-client = commands.Bot(command_prefix='!', case_insensitive=True, strip_after_prefix=True)
+# PortalBot v1.0
+
+client = commands.Bot(command_prefix='!')
 
 # Suppress FutureWarning in console from pandas
 warnings.simplefilter(action='ignore', category=FutureWarning)
-# Supress SQLAlchemy related UserWarning in console from pandas
+# Suppress SQLAlchemy related UserWarning in console from pandas
 warnings.simplefilter(action='ignore', category=UserWarning)
 
 
@@ -18,47 +17,15 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 async def on_ready():
     print('Successfully logged in as {0.user}'.format(client))
 
-    print(client.all_commands)
-
 
 @client.event
 async def on_message(message):
-    # If message is from bot, don't do anything
-    if message.author == client.user:
-        return
-
-    command = message.content.split(" ")[0].lower()
-    args = message.content.split(" ")[1:]
-
-    # Run Command
-    if command.startswith('!run'):
-        await RunCommand.on_command(message, args)
-        return
-
-    # General Points Leaderboard Commands
-    if command.startswith('!leaderboard') or command.startswith('!lb'):
-        await LeaderboardCommand.on_command(message, args)
-        return
-
-    # Chamber Points Leaderboard Commands
-    if command.startswith('!levelboard') or command.startswith('!lvlb'):
-        await LevelboardCommand.on_command(message, args)
-        return
-
-    # Profile Commands
-    if command.startswith('!profile') or command.startswith('!pf'):
-        await ProfileCommand.on_command(message, args)
-        return
-
-    # Recent Command
-    if command.startswith('!recent'):
-        await RecentCommand.on_command(message, args)
-        return
-
-    # Convert Command
-    if command.startswith('!convert'):
-        await ConvertCommand.on_command(message, args)
-        return
+    await client.process_commands(message)
 
 
-client.run(open("token.txt", "r").read())
+for filename in os.listdir('./cmd'):
+    if filename.endswith('.py') and filename != '__init__.py':
+        client.load_extension(f'cmd.{filename[:-3]}')
+        print(f'Loaded cmd.{filename[:-3]}')
+
+client.run(open('token.txt', 'r').read())

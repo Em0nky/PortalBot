@@ -15,8 +15,11 @@ class BoardSortValue:
     points_glitchless = 'points_glitchless'
 
 
-def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_ascending=False, board_length=10):
+def translate_filter_arg(arg: str):
+    pass
 
+
+def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_ascending=False, board_length=10):
     # Read SQL data into a pandas dataframe, sort it and get the first 'board_length' rows
     df = pandas.read_sql('select * from runners', db.get_connection())
     df = df.sort_values(sort_value, ascending=sort_ascending)
@@ -27,12 +30,17 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
 
     header_mod = '🔼' if sort_ascending else '🔽'
     header_values = ['Place', 'Player', 'Overall', 'Glitchless', 'Inbounds', 'OoB']
+    header_mod = '' if (sort_value is BoardSortValue.points_overall and sort_ascending is False) else header_mod
 
     match sort_value:
-        case BoardSortValue.points_overall: header_values[2] = 'Overall' + header_mod
-        case BoardSortValue.points_glitchless: header_values[3] = 'Glitchless' + header_mod
-        case BoardSortValue.points_inbounds: header_values[4] = 'Inbounds' + header_mod
-        case BoardSortValue.points_oob: header_values[5] = 'OoB' + header_mod
+        case BoardSortValue.points_overall:
+            header_values[2] = 'Overall' + header_mod
+        case BoardSortValue.points_glitchless:
+            header_values[3] = 'Glitch...' + header_mod
+        case BoardSortValue.points_inbounds:
+            header_values[4] = 'Inbo...' + header_mod
+        case BoardSortValue.points_oob:
+            header_values[5] = 'OoB' + header_mod
 
     # Generate table from dataframe using plotly
     fig = pgo.Figure(data=[pgo.Table(
@@ -58,29 +66,38 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
     print('Generated new list.png')
 
 
-def export_image_level(level, category, board_length=10):
+def export_image_level(level, category, result_filter=None, board_length=10):
+
     # Modify Table height according to board length
-    df = pandas.read_sql(f'select * from runs where level="{level}" and category="{category}"', db.get_connection())
+    df = pandas.read_sql(
+        'select * from runs where level="%s" and category="%s"%s' % (category, level,
+                                                                     ' and %s' % result_filter.replace('&', ' and ') if result_filter is not None else ''),
+        db.get_connection())
+
     df = df.sort_values('place', ascending=True)
+    df['place'] = df.apply(lambda row: '%d%s' % (row.place, {1: 'st', 2: 'nd', 3: 'rd'}.get(
+        row.place if row.place < 20 else row.place % 10, 'th')), axis=1)
     df['ticks'] = df.apply(lambda row: row.time / 15 if row.time / 15 % 1 == 0 else round(row.time / 15), axis=1)
-    board_length = len(df) if (board_length == -1) else board_length
     df = df.head(board_length)
+    board_length = len(df)
 
     # Using plotly to generate table and subsequent image
     fig = pgo.Figure(data=[pgo.Table(
         columnwidth=[15, 60, 20, 25, 20],
-        header=dict(values=['Rank', 'Player', 'Points', 'Time', 'Ticks'],
+        header=dict(values=['Place', 'Player', 'Points', 'Time', 'Ticks'],
                     height=22,
                     line_color='black',
                     fill_color='#1b1b1b',
                     font=dict(color='white', size=14, family='Consolas'),
                     align=['center', 'left', 'center']),
-        cells=dict(values=[df.place, df.speedrun_username, df.points, df.time / 1000, df.ticks],
+        cells=dict(values=[df.place, df.speedrun_username, df.points, df.time / 1000, df['ticks']],
                    line_color='black',
                    fill_color='white',
                    font=dict(color='black', size=14, family='Consolas'),
                    align=['center', 'left', 'center']))
     ])
+
+    print(fig)
 
     # Modify Table height according to board length
     mult_height = (20 * board_length) + 300
@@ -144,6 +161,3 @@ def export_image_profile(player, board_length=10):
     listimg = Image.open("list.png")
     listimg = listimg.crop((160, 200, 1240, (heightMult * 2) - 345))
     listimg.save("list.png")
-
-
-export_image_leaderboard(BoardSortValue.points_glitchless, False)
