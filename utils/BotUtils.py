@@ -1,6 +1,9 @@
 import time
+from datetime import datetime
 
 import discord
+
+from dto.RunDTO import RunDTO
 
 category_list = ["Inbounds", "Out_of_Bounds", "Glitchless"]
 level_list = ["00-01", "02-03", "04-05", "06-07", "08", "09", "10",
@@ -52,52 +55,6 @@ def input_to_chamber(chamber):
         case 'adv17': return level_list[22]
         case 'adv18': return level_list[23]
         case _: return None
-
-
-def embedRun(runInfo):
-    """Creates an embed for the run command."""
-
-    pName = runInfo[0]
-    cat = runInfo[1]
-    chamber = runInfo[2]
-    place = runInfo[3]
-    points = runInfo[4]
-    time = runInfo[5]
-    date = runInfo[8]
-    runLink = runInfo[6]
-    vidLink = runInfo[7]
-    playerID = runInfo[9]
-    runTicks = (float(time) / .015)
-
-    if vidLink == "N/A":
-        embed = discord.Embed(description=f"[Run]({runLink}) | N/A")
-    else:
-        embed = discord.Embed(description=f"[Run]({runLink}) | [Video]({vidLink})")
-
-    if playerID == "":
-        embed.set_thumbnail(
-            url="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.freebiesupply.com%2Flogos%2Flarge%2F2x%2Fportal-9-logo-png-transparent.png&f=1&nofb=1")
-        embed.set_author(name=f"{pName}'s {cat} {chamber} Run")
-    else:
-        embed.set_thumbnail(url=f"https://www.speedrun.com/userasset/{playerID}/image?v=3d18eec")
-        embed.set_author(name=f"{pName}'s {cat} {chamber} Run", url=f"https://www.speedrun.com/user/{pName}")
-
-    # TODO Switch statement instead
-    if place == 1:
-        embed.add_field(name="**Place**", value=":trophy: 1st", inline=True)
-    elif place == 2:
-        embed.add_field(name="**Place**", value=":second_place: 2nd", inline=True)
-    elif place == 3:
-        embed.add_field(name="**Place**", value=":third_place: 3rd", inline=True)
-    else:
-        embed.add_field(name="**Place**", value=f"{place}th", inline=True)
-
-    embed.add_field(name="**Points**", value=f"{points}", inline=True)
-    embed.add_field(name="**Date**", value=f"{date}", inline=False)
-    embed.add_field(name="**Time**", value=f"{time}", inline=True)
-    embed.add_field(name="**Ticks**", value=f"{runTicks:.0f}", inline=True)
-
-    return embed
 
 
 def embedProfile(userMessage, profileCreated, playerID, playerName):

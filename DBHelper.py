@@ -373,7 +373,7 @@ def userprofileCommand(userMessage):
         return 'Error fetching data from speedrun.com'
 
 
-def runCommand(self, userMessage):
+def runCommand(userMessage):
     """Command used for the bot to return information on a run
     !Run [PLAYER] [CATEGORY] [CHAMBER]"""
 

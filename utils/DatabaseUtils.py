@@ -39,6 +39,27 @@ def get_all_runs():
     return reversed(list(runs))
 
 
+def get_run_from_player(player, category, level):
+
+    c = get_connection().cursor()
+    c.execute('select * from runs where speedrun_username="%s" and level="%s" and category="%s"' % (player, level, category))
+    result = c.fetchone()
+
+    return RunDTO(
+            category=result[0],
+            speedrun_username=result[1],
+            speedrun_id=result[2],
+            level=result[3],
+            weblink=result[4],
+            video=result[5],
+            demos=result[6],
+            place=result[7],
+            points=result[8],
+            time=result[9],
+            date=result[10]
+        )
+
+
 def get_all_runners():
     c = get_connection().cursor()
     c.execute('select * from runners')
