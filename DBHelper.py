@@ -89,7 +89,8 @@ def exportPlayerProfileCategory(self, player, category):
                     fill_color='#1b1b1b',
                     font=dict(color='white', size=12),
                     align='left'),
-        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
+        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points,
+                           df.Time, df.Ticks],
                    fill_color='#D3D3D3',
                    align='left'))
 
@@ -157,7 +158,8 @@ def exportPlayerProfileCategoryAll(self, player, category):
                     fill_color='#1b1b1b',
                     font=dict(color='white', size=12),
                     align='left'),
-        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
+        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points,
+                           df.Time, df.Ticks],
                    fill_color='#D3D3D3',
                    align='left'))
     ])
@@ -211,7 +213,8 @@ def exportPlayerProfileCategoryDate(self, player, category):
     df.Time = df.Time.round(decimals=3)
     df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
     df.Ticks = df.Ticks.round(decimals=0)
-    columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks', 'Date']
+    columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time',
+                     'Ticks', 'Date']
 
     # Using plotly to generate table and subsequent image
     fig = pgo.Figure(data=[pgo.Table(
@@ -221,7 +224,8 @@ def exportPlayerProfileCategoryDate(self, player, category):
                     fill_color='#1b1b1b',
                     font=dict(color='white', size=12),
                     align='left'),
-        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks, df.Date],
+        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points,
+                           df.Time, df.Ticks, df.Date],
                    fill_color='#D3D3D3',
                    align='left'))
     ])
@@ -271,7 +275,8 @@ def userprofileCommand(userMessage):
             catRanks = ""
             missingCats = 0
 
-            df = pandas.read_sql_query("SELECT * FROM Overall_Runner_Board;", get_connection())
+            df = pandas.read_sql_query("SELECT * FROM Overall_Runner_Board;",
+                                       get_connection())
             df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
             df = df.sort_values('Points', ascending=False)  # Sorts by Points
             df["Ranking"] = df["Points"].rank(method='min', ascending=False)
@@ -282,7 +287,9 @@ def userprofileCommand(userMessage):
 
             for cat in BotUtils.category_list:
                 try:
-                    df = pandas.read_sql_query(f"SELECT * FROM {cat}_Runner_Board;", get_connection())
+                    df = pandas.read_sql_query(f"SELECT * FROM"
+                                               f"{cat}_Runner_Board;",
+                                               get_connection())
                     df.rename(columns={'SUM(Points)': 'Points'}, inplace=True)
                     df = df.sort_values('Points', ascending=False)  # Sorts by Points
                     df["Ranking"] = df["Points"].rank(method='min', ascending=False)

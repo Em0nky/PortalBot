@@ -39,6 +39,29 @@ def get_all_runs():
     return reversed(list(runs))
 
 
+def get_runner_from_name(speedrun_username):
+
+    c = get_connection().cursor()
+    c.execute('select * from runners where speedrun_username="%s"' % speedrun_username)
+    result = c.fetchone()
+
+    return RunnerDTO(
+            discord_id=result[0],
+            speedrun_username=result[1],
+            speedrun_id=result[2],
+            rank_overall=result[3],
+            rank_inbounds=result[4],
+            rank_oob=result[5],
+            rank_glitchless=result[6],
+            points_overall=result[7],
+            points_inbounds=result[8],
+            points_oob=result[9],
+            points_glitchless=result[10]
+        )
+
+    pass
+
+
 def get_run_from_player(player, category, level):
 
     c = get_connection().cursor()

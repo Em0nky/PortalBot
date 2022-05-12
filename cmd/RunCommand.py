@@ -26,6 +26,10 @@ class RunCommand(commands.Cog):
             level = BotUtils.input_to_chamber(args[3])
             run = DatabaseUtils.get_run_from_player(player, category, level)
 
+            if run is None:
+                await ctx.send('Run could not be found.')
+                return
+
             embed = discord.Embed()
             run_links = f'[Run]({run.weblink})'
 

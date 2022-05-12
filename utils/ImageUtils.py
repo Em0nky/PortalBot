@@ -15,22 +15,23 @@ class BoardSortValue:
     points_glitchless = 'points_glitchless'
 
 
-def translate_filter_arg(arg: str):
-    pass
-
-
-def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_ascending=False, board_length=10):
+def export_image_leaderboard(sort_value=BoardSortValue.points_overall,
+                             sort_ascending=False, board_length=10):
     # Read SQL data into a pandas dataframe, sort it and get the first 'board_length' rows
     df = pandas.read_sql('select * from runners', db.get_connection())
     df = df.sort_values(sort_value, ascending=sort_ascending)
-    df['rank_overall'] = df.apply(lambda row: '%d%s' % (row.rank_overall, {1: 'st', 2: 'nd', 3: 'rd'}.get(
-        row.rank_overall if row.rank_overall < 20 else row.rank_overall % 10, 'th')), axis=1)
+    df['rank_overall'] = df.apply(lambda row: '%d%s' % (
+        row.rank_overall, {1: 'st', 2: 'nd', 3: 'rd'}.get(
+            row.rank_overall if row.rank_overall < 20 else row.rank_overall % 10,
+            'th')), axis=1)
     board_length = len(df) if (board_length == -1) else board_length
     df = df.head(board_length)
 
     header_mod = '🔼' if sort_ascending else '🔽'
-    header_values = ['Place', 'Player', 'Overall', 'Glitchless', 'Inbounds', 'OoB']
-    header_mod = '' if (sort_value is BoardSortValue.points_overall and sort_ascending is False) else header_mod
+    header_values = ['Place', 'Player', 'Overall', 'Glitchless', 'Inbounds',
+                     'OoB']
+    header_mod = '' if (
+            sort_value is BoardSortValue.points_overall and sort_ascending is False) else header_mod
 
     match sort_value:
         case BoardSortValue.points_overall:
@@ -50,7 +51,8 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
                     font=dict(color='white', size=14, family='Consolas'),
                     align=['center', 'left', 'center']),
         cells=dict(
-            values=[df.rank_overall, df.speedrun_username, df.points_overall, df.points_glitchless, df.points_inbounds,
+            values=[df.rank_overall, df.speedrun_username, df.points_overall,
+                    df.points_glitchless, df.points_inbounds,
                     df.points_oob],
             line_color='black', fill_color='white',
             font=dict(color='black', size=14, family='Consolas'),
@@ -62,22 +64,27 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
     fig.write_image('list.png')
 
     # Crop the plotly image using pillow
-    Image.open('list.png').crop((160, 200, 1240, (mult_height * 2) - 355)).save('list.png')
+    Image.open('list.png').crop(
+        (160, 200, 1240, (mult_height * 2) - 355)).save('list.png')
     print('Generated new list.png')
 
 
 def export_image_level(level, category, result_filter=None, board_length=10):
-
     # Modify Table height according to board length
     df = pandas.read_sql(
-        'select * from runs where level="%s" and category="%s"%s' % (category, level,
-                                                                     ' and %s' % result_filter.replace('&', ' and ') if result_filter is not None else ''),
+        'select * from runs where level="%s" and category="%s"%s' % (
+            category, level,
+            ' and %s' % result_filter.replace('&',
+                                              ' and ') if result_filter is not None else ''),
         db.get_connection())
 
     df = df.sort_values('place', ascending=True)
-    df['place'] = df.apply(lambda row: '%d%s' % (row.place, {1: 'st', 2: 'nd', 3: 'rd'}.get(
-        row.place if row.place < 20 else row.place % 10, 'th')), axis=1)
-    df['ticks'] = df.apply(lambda row: row.time / 15 if row.time / 15 % 1 == 0 else round(row.time / 15), axis=1)
+    df['place'] = df.apply(
+        lambda row: '%d%s' % (row.place, {1: 'st', 2: 'nd', 3: 'rd'}.get(
+            row.place if row.place < 20 else row.place % 10, 'th')), axis=1)
+    df['ticks'] = df.apply(
+        lambda row: row.time / 15 if row.time / 15 % 1 == 0 else round(
+            row.time / 15), axis=1)
     df = df.head(board_length)
     board_length = len(df)
 
@@ -90,14 +97,14 @@ def export_image_level(level, category, result_filter=None, board_length=10):
                     fill_color='#1b1b1b',
                     font=dict(color='white', size=14, family='Consolas'),
                     align=['center', 'left', 'center']),
-        cells=dict(values=[df.place, df.speedrun_username, df.points, df.time / 1000, df['ticks']],
-                   line_color='black',
-                   fill_color='white',
-                   font=dict(color='black', size=14, family='Consolas'),
-                   align=['center', 'left', 'center']))
+        cells=dict(
+            values=[df.place, df.speedrun_username, df.points, df.time / 1000,
+                    df['ticks']],
+            line_color='black',
+            fill_color='white',
+            font=dict(color='black', size=14, family='Consolas'),
+            align=['center', 'left', 'center']))
     ])
-
-    print(fig)
 
     # Modify Table height according to board length
     mult_height = (20 * board_length) + 300
@@ -105,59 +112,45 @@ def export_image_level(level, category, result_filter=None, board_length=10):
     fig.write_image("list.png")
 
     # Crop the plotly image
-    Image.open("list.png").crop((160, 200, 1240, (mult_height * 2) - 355)).save("list.png")
+    Image.open("list.png").crop(
+        (160, 200, 1240, (mult_height * 2) - 355)).save("list.png")
     print('Generated new list.png')
 
 
-def export_image_profile(player, board_length=10):
-    df = pandas.read_sql_query(f"SELECT * FROM runs;", db.get_connection())
-    df['RunnerNameLower'] = df['RunnerName'].str.lower()
-    df = df[df['RunnerNameLower'] == player.lower()]
+def export_image_profile(player):
 
-    if category is None:
-        df = df[df['Category'] == category]
-
-    df = df.drop('RunnerNameLower', 1)
-    df = df.drop('RunnerName', 1)
-    df = df.drop('SRCID', 1)
-    df = df.drop('Link', 1)
-    df = df.drop('VideoLink', 1)
-    df = df.drop('Date', 1)
-    df = df.drop('Ticks', 1)
-    df['Chamber'] = df['Chamber'].str.replace("_", " ")
-    df['Category'] = df['Category'].str.replace("_", " ")
-
-    df = df.sort_values('Points', ascending=False)
-    df.Points = df.Points.round(decimals=2)
-    df.Time = df.Time.round(decimals=3)
-    df['Ticks'] = df.apply(lambda row: row.Time / .015, axis=1)
-    df.Ticks = df.Ticks.round(decimals=0)
-
-    if board_length == -1:
-        board_length = len(df)
-
-    df = df.nsmallest(board_length, 'Place')  # Top 5 Runs
-    columnHeaders = ['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks']
+    df = pandas.read_sql_query(
+        f'select * from runs where speedrun_username="%s"' % player,
+        db.get_connection())
+    df = df.sort_values('points', ascending=False)
+    df['ticks'] = df.apply(
+        lambda row: row.time / 15 if row.time / 15 % 1 == 0 else round(
+            row.time / 15), axis=1)
+    board_length = len(df) if len(df) <= 10 else 10
+    df = df.head(board_length)
 
     # Using plotly to generate table and subsequent image
     fig = pgo.Figure(data=[pgo.Table(
-        columnorder=[0, 1, 2, 3, 4, 5],
         columnwidth=[25, 25, 15, 15, 25, 20],
-        header=dict(values=list(columnHeaders),
+        header=dict(values=['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks'],
+                    height=22,
+                    line_color='black',
                     fill_color='#1b1b1b',
-                    font=dict(color='white', size=12),
-                    align='left'),
-        cells=dict(values=[df.Category, df.Chamber, df.Place, df.Points, df.Time, df.Ticks],
-                   fill_color='#D3D3D3',
-                   align='left'))
+                    font=dict(color='white', size=14, family='Consolas'),
+                    align='center'),
+        cells=dict(
+            values=[df.category, df.level, df.place, df.points, df.time / 1000,
+                    df.ticks],
+            line_color='black',
+            fill_color='white',
+            font=dict(color='black', size=14, family='Consolas'),
+            align='center'))
     ])
 
-    boardLength = len(df)
-    heightMult = (20 * boardLength) + 300
-    pio.kaleido.scope.default_height = heightMult
-    fig.write_image("list.png")
+    mult_height = (20 * board_length) + 300
+    pio.kaleido.scope.default_height = mult_height
+    fig.write_image('list.png')
 
     # Cropping the plotly image
-    listimg = Image.open("list.png")
-    listimg = listimg.crop((160, 200, 1240, (heightMult * 2) - 345))
-    listimg.save("list.png")
+    Image.open('list.png').crop((160, 200, 1240, (mult_height * 2) - 355))\
+        .save('list.png')
