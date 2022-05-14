@@ -65,5 +65,9 @@ async def on_message(message):
     if command.startswith('!convert'):
         await ConvertCommand.on_command(message, args)
         return
-
+    
+     # Boost Command
+    if command.startswith('!boost'):
+        await BoostCommand.on_command(message, args)
+        return
 client.run(open("botToken.txt", "r").read())
