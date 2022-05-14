@@ -1,0 +1,4 @@
+import discord
+
+async def on_command(event, args):
+    await event.channel.send('>>>happens a lot\ncalled a portal boost\n"random™"\ncan be big or small\nhelpful or not\nwe don\'t know why it happens\nbut sometimes it does\nlife just do be like that sometimes')
