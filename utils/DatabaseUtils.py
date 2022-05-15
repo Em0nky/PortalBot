@@ -9,7 +9,9 @@ connection = None
 def get_connection():
     global connection
     if connection is None:
-        connection = mysql.connector.connect(host='localhost', database='portal_ils', user='root')
+        connection = mysql.connector.connect(host='localhost',
+                                             database='portal_ils',
+                                             user='root')
     return connection
 
 
@@ -36,10 +38,10 @@ def get_all_runs():
 
         runs.append(dto)
 
-    return reversed(list(runs))
+    return runs
 
 
-def get_runner_from_name(speedrun_username):
+def get_runner_from_name(speedrun_username: str):
 
     c = get_connection().cursor()
     c.execute('select * from runners where speedrun_username="%s"' % speedrun_username)
@@ -59,10 +61,8 @@ def get_runner_from_name(speedrun_username):
             points_glitchless=result[10]
         )
 
-    pass
 
-
-def get_run_from_player(player, category, level):
+def get_run_from_player(player: str, category: str, level: str):
 
     c = get_connection().cursor()
     c.execute('select * from runs where speedrun_username="%s" and level="%s" and category="%s"' % (player, level, category))
@@ -109,7 +109,11 @@ def get_all_runners():
     return runners
 
 
-def add_discord_id_to_runner(discord_id, speedrun_username):
+def add_discord_id_to_runner(discord_id: int, speedrun_username: str):
 
     c = get_connection().cursor()
     c.execute(f'update runners set discord_id={discord_id} where speedrun_username="{speedrun_username}"')
+
+
+def get_discord_id_from_runner(speedrun_username: str):
+    pass

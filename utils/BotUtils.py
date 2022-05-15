@@ -15,15 +15,5 @@ def input_to_category(category):
 
 
 def input_to_chamber(chamber):
+    # TODO fix advanced chambers
     return chamber.replace('/', '-')
-
-
-def convert_to_ticks(millis: int):
-    return round(millis / 15)
-
-
-def convert_to_human_time(ticks: int):
-    ms = int(ticks) * 15
-    seconds, ms = divmod(ms, 1000)
-    minutes, seconds = divmod(seconds, 60)
-    return f'{int(minutes):02d}:{int(seconds):02d}.{int(ms):03d}'

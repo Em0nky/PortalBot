@@ -4,6 +4,7 @@ import warnings
 from discord.ext import commands
 
 # PortalBot v1.0
+from discord.ext.commands import CommandNotFound
 
 client = commands.Bot(command_prefix='!')
 
@@ -15,7 +16,7 @@ warnings.simplefilter(action='ignore', category=UserWarning)
 
 @client.event
 async def on_ready():
-    print('Successfully logged in as {0.user}'.format(client))
+    print(f'Successfully logged in as {client.user}')
 
 
 @client.event

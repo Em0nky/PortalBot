@@ -37,9 +37,9 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall,
         case BoardSortValue.points_overall:
             header_values[2] = 'Overall' + header_mod
         case BoardSortValue.points_glitchless:
-            header_values[3] = 'Glitch...' + header_mod
+            header_values[3] = 'Glitchless' + header_mod
         case BoardSortValue.points_inbounds:
-            header_values[4] = 'Inbo...' + header_mod
+            header_values[4] = 'Inbounds' + header_mod
         case BoardSortValue.points_oob:
             header_values[5] = 'OoB' + header_mod
 
@@ -69,13 +69,13 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall,
     print('Generated new list.png')
 
 
-def export_image_level(level, category, result_filter=None, board_length=10):
+def export_image_level(level: str, category: str, result_filter=None, board_length=10):
     # Modify Table height according to board length
     df = pandas.read_sql(
-        'select * from runs where level="%s" and category="%s"%s' % (
-            category, level,
-            ' and %s' % result_filter.replace('&',
-                                              ' and ') if result_filter is not None else ''),
+        'select * from runs where level="%s" and category="%s"%s'
+        % (category, level, ' and %s'
+                            % result_filter.replace('&',
+                                                    ' and ') if result_filter is not None else ''),
         db.get_connection())
 
     df = df.sort_values('place', ascending=True)
@@ -117,8 +117,7 @@ def export_image_level(level, category, result_filter=None, board_length=10):
     print('Generated new list.png')
 
 
-def export_image_profile(player):
-
+def export_image_profile(player: str):
     df = pandas.read_sql_query(
         f'select * from runs where speedrun_username="%s"' % player,
         db.get_connection())
@@ -132,12 +131,13 @@ def export_image_profile(player):
     # Using plotly to generate table and subsequent image
     fig = pgo.Figure(data=[pgo.Table(
         columnwidth=[25, 25, 15, 15, 25, 20],
-        header=dict(values=['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks'],
-                    height=22,
-                    line_color='black',
-                    fill_color='#1b1b1b',
-                    font=dict(color='white', size=14, family='Consolas'),
-                    align='center'),
+        header=dict(
+            values=['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks'],
+            height=22,
+            line_color='black',
+            fill_color='#1b1b1b',
+            font=dict(color='white', size=14, family='Consolas'),
+            align='center'),
         cells=dict(
             values=[df.category, df.level, df.place, df.points, df.time / 1000,
                     df.ticks],
@@ -152,5 +152,10 @@ def export_image_profile(player):
     fig.write_image('list.png')
 
     # Cropping the plotly image
-    Image.open('list.png').crop((160, 200, 1240, (mult_height * 2) - 355))\
+    Image.open('list.png').crop((160, 200, 1240, (mult_height * 2) - 355)) \
         .save('list.png')
+    print('Generated new list.png')
+
+
+def export_image_recent(player: str, board_length=10):
+    pass

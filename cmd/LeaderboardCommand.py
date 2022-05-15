@@ -1,12 +1,5 @@
 import discord
 from discord.ext import commands
-
-
-# !leaderboard
-# !leaderboard <category>
-# !leaderboard <category> <level>
-# !leaderboard <category> <level> <filter=key[operator]value>
-# !leaderboard o 14 filter=time>15.915 desc
 from utils import ImageUtils, BotUtils
 
 
