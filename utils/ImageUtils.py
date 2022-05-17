@@ -20,18 +20,22 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
 
     # Read SQL data into a pandas dataframe
     df = pandas.read_sql('select * from runners', db.get_connection())
+
     # Sort the values by the specified sort value asc or desc
     df = df.sort_values(sort_value, ascending=sort_ascending)
 
     # Add ordinals to the overall rank
     df['rank_overall'] = df.apply(lambda row: '%d%s' % (row.rank_overall, {1: 'st', 2: 'nd', 3: 'rd'}.get(row.rank_overall if row.rank_overall < 20 else row.rank_overall % 10, 'th')), axis=1)
+
     # Change board length variable to the length of the dataframe if board length was requested to be -1
     board_length = len(df) if (board_length == -1) else board_length
+
     # Cut dataframe to board length
     df = df.head(board_length)
 
     # Change header symbol accordingly
     header_mod = '🔼' if sort_ascending else '🔽'
+
     # No header symbol it sorting is default
     header_mod = '' if (sort_value is BoardSortValue.points_overall and sort_ascending is False) else header_mod
 
@@ -65,6 +69,7 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
     # Calculate height multiplier for kaleido
     mult_height = (20 * board_length) + 300
     pio.kaleido.scope.default_height = mult_height
+
     # Write generated table to file
     fig.write_image('list.png')
 
@@ -103,7 +108,6 @@ def export_image_level(level: str, category: str, result_filter=None, board_leng
     mult_height = (20 * board_length) + 300
     pio.kaleido.scope.default_height = mult_height
     fig.write_image("list.png")
-
     Image.open("list.png").crop((160, 200, 1240, (mult_height * 2) - 355)).save("list.png")
     print('Generated new list.png: export_image_level', level, category, result_filter, board_length)
 
@@ -136,8 +140,6 @@ def export_image_profile(player: str):
     mult_height = (20 * board_length) + 300
     pio.kaleido.scope.default_height = mult_height
     fig.write_image('list.png')
-
-    # Cropping the plotly image
     Image.open('list.png').crop((160, 200, 1240, (mult_height * 2) - 355)).save('list.png')
     print('Generated new list.png: export_image_profile', player)
 

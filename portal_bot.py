@@ -3,7 +3,7 @@ import warnings
 
 from discord.ext import commands
 
-# PortalBot v1.0 | Developed and maintained by Em0nky and lundylizard
+# PortalBot v1.0
 client = commands.Bot(command_prefix='!', help_command=None)
 
 # Suppress FutureWarning in console from pandas

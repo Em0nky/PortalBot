@@ -1,4 +1,3 @@
-category_list = ['Inbounds', 'Out_of_Bounds', 'Glitchless']
 level_list = list(['00-01', '02-03', '04-05', '06-07', '08', '09', '10',
                    '11-12', '13', '14', '15', '16', '17', '18', '19', 'e00', 'e01', 'e02',
                    'Adv_13', 'Adv_14', 'Adv_15', 'Adv_16', 'Adv_17', 'Adv_18'])
