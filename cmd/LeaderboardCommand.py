@@ -34,7 +34,7 @@ class LeaderboardCommand(commands.Cog):
                 case 'Glitchless': ImageUtils.export_image_leaderboard(ImageUtils.BoardSortValue.points_glitchless)
                 case 'Out_of_Bounds': ImageUtils.export_image_leaderboard(ImageUtils.BoardSortValue.points_oob)
                 case _:
-                    await ctx.send('**Invalid Category:** Valid: `Inbounds, Glitchless, OoB` | !help leaderboard')
+                    await ctx.send(f'Invalid category, please use `Inbounds`, `OoB` or `Glitchless`')
                     return
 
             embed = discord.Embed()
@@ -50,6 +50,14 @@ class LeaderboardCommand(commands.Cog):
             category = BotUtils.input_to_category(args[1])
             level = BotUtils.input_to_chamber(args[2])
 
+            if category is None:
+                await ctx.send('**Invalid Category:** Valid: `Inbounds, Glitchless, OoB` | !help leaderboard')
+                return
+
+            if level is None:
+                await ctx.send(f'{args[2]} is not a valid level.')
+                return
+
             ImageUtils.export_image_level(category, level)
 
             embed = discord.Embed()
@@ -63,9 +71,18 @@ class LeaderboardCommand(commands.Cog):
         elif len(args) == 4:
 
             if args[3].startswith('filter='):
+
                 result_filter = args[3].replace('filter=', '')
                 category = BotUtils.input_to_category(args[1])
                 level = BotUtils.input_to_chamber(args[2])
+
+                if category is None:
+                    await ctx.send('**Invalid Category:** Valid: `Inbounds, Glitchless, OoB` | !help leaderboard')
+                    return
+
+                if level is None:
+                    await ctx.send(f'{args[2]} is not a valid level.')
+                    return
 
                 ImageUtils.export_image_level(category, level, result_filter=result_filter)
 

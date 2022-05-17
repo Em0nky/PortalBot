@@ -1,39 +1,41 @@
+from mysql.connector import MySQLConnection
 from dto.RunDTO import RunDTO
 import mysql.connector
-
 from dto.RunnerDTO import RunnerDTO
 
 connection = None
 
 
-def get_connection():
+def get_connection() -> MySQLConnection:
+
     global connection
     if connection is None:
-        connection = mysql.connector.connect(host='localhost',
-                                             database='portal_ils',
-                                             user='root')
+        # TODO Use config values
+        connection = mysql.connector.connect(host='localhost', database='portal_ils', user='root')
     return connection
 
 
-def get_all_runs():
+def get_all_runs() -> list:
+
     c = get_connection().cursor()
     c.execute('select * from runs')
-    result = c.fetchall()
+    results = c.fetchall()
     runs = list()
 
-    for x in result:
+    for result in results:
+
         dto = RunDTO(
-            category=x[0],
-            speedrun_username=x[1],
-            speedrun_id=x[2],
-            level=x[3],
-            weblink=x[4],
-            video=x[5],
-            demos=x[6],
-            place=x[7],
-            points=x[8],
-            time=x[9],
-            date=x[10]
+            category=result[0],
+            speedrun_username=result[1],
+            speedrun_id=result[2],
+            level=result[3],
+            weblink=result[4],
+            video=result[5],
+            demos=result[6],
+            place=result[7],
+            points=result[8],
+            time=result[9],
+            date=result[10]
         )
 
         runs.append(dto)
@@ -41,7 +43,7 @@ def get_all_runs():
     return runs
 
 
-def get_runner_from_name(speedrun_username: str):
+def get_runner_from_name(speedrun_username: str) -> RunnerDTO:
 
     c = get_connection().cursor()
     c.execute('select * from runners where speedrun_username="%s"' % speedrun_username)
@@ -62,7 +64,28 @@ def get_runner_from_name(speedrun_username: str):
         )
 
 
-def get_run_from_player(player: str, category: str, level: str):
+def get_runner_from_discord_id(discord_id: int) -> RunnerDTO:
+
+    c = get_connection().cursor()
+    c.execute('select * from runners where discord_id=%s' % discord_id)
+    result = c.fetchone()
+
+    return RunnerDTO(
+        discord_id=result[0],
+        speedrun_username=result[1],
+        speedrun_id=result[2],
+        rank_overall=result[3],
+        rank_inbounds=result[4],
+        rank_oob=result[5],
+        rank_glitchless=result[6],
+        points_overall=result[7],
+        points_inbounds=result[8],
+        points_oob=result[9],
+        points_glitchless=result[10]
+    )
+
+
+def get_run_from_player(player: str, category: str, level: str) -> RunDTO:
 
     c = get_connection().cursor()
     c.execute('select * from runs where speedrun_username="%s" and level="%s" and category="%s"' % (player, level, category))
@@ -83,25 +106,27 @@ def get_run_from_player(player: str, category: str, level: str):
         )
 
 
-def get_all_runners():
+def get_all_runners() -> list:
+
     c = get_connection().cursor()
     c.execute('select * from runners')
-    result = c.fetchall()
-    runners = []
+    results = c.fetchall()
+    runners = list()
 
-    for x in result:
+    for result in results:
+
         dto = RunnerDTO(
-            discord_id=x[0],
-            speedrun_username=x[1],
-            speedrun_id=x[2],
-            rank_overall=x[3],
-            rank_inbounds=x[4],
-            rank_oob=x[5],
-            rank_glitchless=x[6],
-            points_overall=x[7],
-            points_inbounds=x[8],
-            points_oob=x[9],
-            points_glitchless=x[10]
+            discord_id=result[0],
+            speedrun_username=result[1],
+            speedrun_id=result[2],
+            rank_overall=result[3],
+            rank_inbounds=result[4],
+            rank_oob=result[5],
+            rank_glitchless=result[6],
+            points_overall=result[7],
+            points_inbounds=result[8],
+            points_oob=result[9],
+            points_glitchless=result[10]
         )
 
         runners.append(dto)
@@ -113,7 +138,3 @@ def add_discord_id_to_runner(discord_id: int, speedrun_username: str):
 
     c = get_connection().cursor()
     c.execute(f'update runners set discord_id={discord_id} where speedrun_username="{speedrun_username}"')
-
-
-def get_discord_id_from_runner(speedrun_username: str):
-    pass

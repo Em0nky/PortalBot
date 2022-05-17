@@ -19,12 +19,26 @@ class RunCommand(commands.Cog):
 
         else:
 
-            player = args[1]
             category = BotUtils.input_to_category(args[2])
             level = BotUtils.input_to_chamber(args[3])
-            run = DatabaseUtils.get_run_from_player(player, category, level)
 
-            if run is None:
+            try:
+                player = DatabaseUtils.get_runner_from_name(args[1])
+            except TypeError:
+                await ctx.send(f'Runner with username `{args[1]}` could not be found.')
+                return
+
+            if category is None:
+                await ctx.send(f'Invalid category, please use `Inbounds`, `OoB` or `Glitchless`')
+                return
+
+            if level is None:
+                await ctx.send(f'`{args[3]}` is not a valid level.')
+                return
+
+            try:
+                run = DatabaseUtils.get_run_from_player(player.speedrun_username, category, level)
+            except TypeError:
                 await ctx.send('Run could not be found.')
                 return
 

@@ -1,20 +1,20 @@
-import datetime
 import math
 import re
 from discord.ext import commands
 
 
+# Pretty print milliseconds into a time format
 def human_time(millis: int) -> str:
     seconds, millis = divmod(millis, 1000)
     minutes, seconds = divmod(seconds, 60)
     return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
 
 
-def convert_ms_to_ticks(millis: int):
+def convert_ms_to_ticks(millis: int) -> int:
     return round(millis / 15)
 
 
-def convert_ticks_to_ms(ticks: int):
+def convert_ticks_to_ms(ticks: int) -> int:
     return ticks * 15
 
 
@@ -29,7 +29,7 @@ class ConvertCommand(commands.Cog):
         args = ctx.message.content.split(' ')
 
         if len(args) == 1:
-            await ctx.send('Not enough arguments: `!help convert`')
+            await ctx.send('Please enter a time or ticks, example: `!convert 2300` or `!convert 34.500`')
             return
 
         time = args[1]
@@ -43,8 +43,8 @@ class ConvertCommand(commands.Cog):
         else:
 
             # If time matches ss.mmm
-            if re.match(r'^[1-5]?\d\.\d{3}$', time):
-                ms = (int(time.split('.')[0]) * 1000) + int(time.split('.')[1])
+            if re.match(r'^[1-5]?\d\.\d+$', time):
+                ms = (int(time.split('.')[0]) * 1000) + int(time.split(".")[1])
 
                 if ms % 15 != 0:
                     ticks = round(ms / 15) if (ms / 15) % 1 < .5 else math.ceil(ms / 15)
