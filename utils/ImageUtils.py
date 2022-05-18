@@ -36,7 +36,7 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
     # Change header symbol accordingly
     header_mod = '🔼' if sort_ascending else '🔽'
 
-    # No header symbol it sorting is default
+    # No header symbol if sorting is default
     header_mod = '' if (sort_value is BoardSortValue.points_overall and sort_ascending is False) else header_mod
 
     header_values = ['Place', 'Player', 'Overall', 'Glitchless', 'Inbounds', 'OoB']
@@ -144,5 +144,33 @@ def export_image_profile(player: str):
     print('Generated new list.png: export_image_profile', player)
 
 
-def export_image_recent(player: str, category: str):
-    pass
+def export_image_recent(player: str):
+
+    df = pandas.read_sql_query(f'select * from runs where speedrun_username="%s"' % player, db.get_connection())
+    df = df.sort_values('date', ascending=True)
+    df['ticks'] = df.apply(lambda row: round(row.time / 15), axis=1)
+    board_length = len(df) if len(df) <= 10 else 10
+    df = df.head(board_length)
+
+    fig = pgo.Figure(data=[pgo.Table(
+        columnwidth=[25, 25, 15, 15, 25, 20],
+        header=dict(
+            values=['Category', 'Chamber', 'Place', 'Points', 'Time', 'Ticks'],
+            height=22,
+            line_color='black',
+            fill_color='#1b1b1b',
+            font=dict(color='white', size=14, family='Consolas'),
+            align='center'),
+        cells=dict(
+            values=[df.category, df.level, df.place, df.points, df.time / 1000, df.ticks],
+            line_color='black',
+            fill_color='white',
+            font=dict(color='black', size=14, family='Consolas'),
+            align='center'))
+    ])
+
+    mult_height = (20 * board_length) + 300
+    pio.kaleido.scope.default_height = mult_height
+    fig.write_image('list.png')
+    Image.open('list.png').crop((160, 200, 1240, (mult_height * 2) - 355)).save('list.png')
+    print('Generated new list.png: export_image_recent', player)

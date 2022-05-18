@@ -34,7 +34,7 @@ class LeaderboardCommand(commands.Cog):
                 case 'Glitchless': ImageUtils.export_image_leaderboard(ImageUtils.BoardSortValue.points_glitchless)
                 case 'Out_of_Bounds': ImageUtils.export_image_leaderboard(ImageUtils.BoardSortValue.points_oob)
                 case _:
-                    await ctx.send(f'Invalid category, please use `Inbounds`, `OoB` or `Glitchless`')
+                    await ctx.send('Invalid category, please use `Inbounds`, `OoB` or `Glitchless`')
                     return
 
             embed = discord.Embed()
@@ -51,7 +51,7 @@ class LeaderboardCommand(commands.Cog):
             level = BotUtils.input_to_chamber(args[2])
 
             if category is None:
-                await ctx.send('**Invalid Category:** Valid: `Inbounds, Glitchless, OoB` | !help leaderboard')
+                await ctx.send('Invalid category, please use `Inbounds`, `OoB` or `Glitchless`')
                 return
 
             if level is None:
@@ -77,7 +77,7 @@ class LeaderboardCommand(commands.Cog):
                 level = BotUtils.input_to_chamber(args[2])
 
                 if category is None:
-                    await ctx.send('**Invalid Category:** Valid: `Inbounds, Glitchless, OoB` | !help leaderboard')
+                    await ctx.send('Invalid category, please use `Inbounds`, `OoB` or `Glitchless`')
                     return
 
                 if level is None:

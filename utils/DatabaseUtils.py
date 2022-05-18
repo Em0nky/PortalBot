@@ -10,7 +10,6 @@ def get_connection() -> MySQLConnection:
 
     global connection
     if connection is None:
-        # TODO Use config values
         connection = mysql.connector.connect(host='localhost', database='portal_ils', user='root')
     return connection
 
@@ -83,6 +82,32 @@ def get_runner_from_discord_id(discord_id: int) -> RunnerDTO:
         points_oob=result[9],
         points_glitchless=result[10]
     )
+
+
+def get_all_runs_from_player(player: str) -> list:
+
+    c = get_connection().cursor()
+    c.execute('select * from runs where speedrun_username="%s"' % player)
+    results = c.fetchall()
+    all_runs = list()
+
+    for r in results:
+        r = RunDTO(
+            category=r[0],
+            speedrun_username=r[1],
+            speedrun_id=r[2],
+            level=r[3],
+            weblink=r[4],
+            video=r[5],
+            demos=r[6],
+            place=r[7],
+            points=r[8],
+            time=r[9],
+            date=r[10]
+        )
+        all_runs.append(r)
+
+    return all_runs
 
 
 def get_run_from_player(player: str, category: str, level: str) -> RunDTO:
