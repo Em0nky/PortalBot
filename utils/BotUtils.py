@@ -11,7 +11,7 @@ def input_to_category(category: str) -> str | None:
     match category.lower():
         case 'inbounds' | 'i' | 'inbob': return 'Inbounds'
         case 'oob' | 'o': return 'Out_of_Bounds'
-        case 'gless' | 'glitchless' | 'g': return 'Glitchless'
+        case 'gless' | 'glitchless' | 'g' | 'gl': return 'Glitchless'
         case _: return None
 
 

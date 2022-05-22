@@ -77,7 +77,7 @@ class LeaderboardCommand(commands.Cog):
 
             embed = discord.Embed()
             embed.__setattr__('color', 0x00ffff)
-            embed.title = f'Top 10 __{level}: {category.replace("_", " ")}__ Leaderboard'
+            embed.title = f'Top 10 __{level.replace("_", " ")}: {category.replace("_", " ")}__ Leaderboard'
             image = discord.File('list.png')
             embed.set_image(url='attachment://list.png')
 

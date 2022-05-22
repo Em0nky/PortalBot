@@ -7,7 +7,7 @@ from discord.ext import commands
 def human_time(millis: int) -> str:
     seconds, millis = divmod(millis, 1000)
     minutes, seconds = divmod(seconds, 60)
-    return f"{minutes:02d}:{seconds:02d}.{millis:03d}"
+    return f'{minutes:02d}:{seconds:02d}.{millis:03d}'
 
 
 def convert_ms_to_ticks(millis: int) -> int:
@@ -54,7 +54,7 @@ class ConvertCommand(commands.Cog):
                     await ctx.send(f'Converted ticks: `{ticks}`')
 
             # If time matches MM:ss.mmm
-            elif re.match(r'^\d+:[1-5]?\d\.\d{3}$', time):
+            elif re.match(r"^[0-5]?\d+:[0-5]?\d\.\d{3}$", time):
 
                 ms = (int(time.split(':')[0]) * 60000) + \
                      (int(time.split(':')[1].split('.')[0]) * 1000) + \

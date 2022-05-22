@@ -23,6 +23,7 @@ class HelpCommand(commands.Cog):
                                 '`!connect` - Connect your speedrun.com profile.\n' \
                                 '`!profile` - View profile from a specified runner.\n' \
                                 '`!convert` - Convert between time and ticks.\n' \
+                                '`!compare` - Compare runner leaderboard stats.\n' \
                                 '`!recent` - Get the 10 most recent IL runs from a runner.\n' \
                                 '`!run` - Get a specific IL run from runner\n\n' \
                                 '» For help for a specific command use `!help [command]`'
@@ -76,9 +77,6 @@ class HelpCommand(commands.Cog):
                                 value=' Requires connected account: Display a list of your 10 most recent ils.')
                 embed.add_field(name='!recent [player]',
                                 value='Display a list of [player]\'s 10 most recent ILs.',
-                                inline=False)
-                embed.add_field(name='!recent [player] [category]',
-                                value='Display a list of [player]\'s 10 most recent ILs in specified category.',
                                 inline=False)
 
             elif args[1].lower() == 'convert':

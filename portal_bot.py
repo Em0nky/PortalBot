@@ -1,6 +1,7 @@
 import os
 import warnings
 from discord.ext import commands
+from discord.ext.commands import CommandNotFound
 
 client = commands.Bot(command_prefix='!', help_command=None)
 
@@ -20,6 +21,14 @@ async def on_ready():
 @client.event
 async def on_message(message):
     await client.process_commands(message)
+
+
+# Don't show command not found error in log
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+        return
+    raise error
 
 
 # Load all commands as extensions for discord.py

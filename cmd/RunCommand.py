@@ -4,6 +4,18 @@ from discord.ext import commands
 from utils import BotUtils, DatabaseUtils
 
 
+def detect_map_in_args(args):
+    for a in args:
+        if BotUtils.input_to_chamber(a) is not None:
+            return a
+
+
+def detect_category_in_args(args):
+    for a in args:
+        if BotUtils.input_to_category(a) is not None:
+            return a
+
+
 class RunCommand(commands.Cog):
 
     def __init__(self, client):
@@ -17,8 +29,8 @@ class RunCommand(commands.Cog):
             await ctx.send('Missing arguments: `!help run`')
             return
 
-        category = BotUtils.input_to_category(args[2])
-        level = BotUtils.input_to_chamber(args[3])
+        category = BotUtils.input_to_category(detect_category_in_args(args))
+        level = BotUtils.input_to_chamber(detect_map_in_args(args))
 
         try:
             player = DatabaseUtils.get_runner_from_name(args[1])
@@ -43,13 +55,13 @@ class RunCommand(commands.Cog):
         embed = discord.Embed()
         run_links = f'[Run]({run.weblink})'
 
-        if run.video is not None:
+        if run.video != 'null':
             run_links += f' | [Video]({run.video})'
 
-        if run.demos is not None:
+        if run.demos != 'null':
             run_links += f' | [Demo]({run.demos})'
 
-        embed.title = f'{run.level}: {run.category.replace("_", " ")} run by {run.speedrun_username}'
+        embed.title = f'{run.level.replace("_", " ")}: {run.category.replace("_", " ")} run by {run.speedrun_username}'
         embed.set_thumbnail(url=f'https://www.speedrun.com/userasset/{run.speedrun_id}/image?v=3d18eec')
         embed.description = f'[ {run_links} ]'
         embed.__setattr__('color', 0x00ffff)
