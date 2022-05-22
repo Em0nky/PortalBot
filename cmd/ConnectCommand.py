@@ -29,15 +29,23 @@ class ConnectCommand(commands.Cog):
         else:
 
             try:
-                username = DatabaseUtils.get_runner_from_name(args[1]).speedrun_username
+                user = DatabaseUtils.get_runner_from_name(args[1])
             except TypeError:
                 await ctx.send('This account does not seem to have any individual level runs.\n'
                                'Please make sure you spelled it correctly.')
                 return
 
-            DatabaseUtils.add_discord_id_to_runner(discord_id, username)
-            await ctx.send(f'Successfully connected account with username `{username}`.\n')
-            print('Discord user', ctx.author.name, 'with id', discord_id, 'is now identified with speedrun.com username', username)
+            if DatabaseUtils.get_runner_from_name(user.speedrun_username).discord_id == discord_id:
+                await ctx.send('You are already connected with account.')
+                return
+
+            if DatabaseUtils.get_runner_from_name(user.speedrun_username).discord_id != 0:
+                await ctx.send('Someone is already connected with this account.')
+                return
+
+            DatabaseUtils.add_or_update_discord_id_of_runner(user.speedrun_username, discord_id)
+            await ctx.send(f'Successfully connected account with username `{user.speedrun_username}`.\n')
+            print('Discord user', ctx.author.name, 'with id', discord_id, 'is now identified with speedrun.com username', user.speedrun_username)
 
 
 def setup(client):

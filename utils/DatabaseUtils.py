@@ -1,3 +1,5 @@
+from typing import Any
+
 from mysql.connector import MySQLConnection
 from dto.RunDTO import RunDTO
 import mysql.connector
@@ -11,6 +13,9 @@ def get_connection() -> MySQLConnection:
     global connection
     if connection is None:
         connection = mysql.connector.connect(host='localhost', database='portal_ils', user='root')
+        # Allow for better error handling
+        # connection.get_warnings = True
+        # connection.raise_on_warnings = True
     return connection
 
 
@@ -22,7 +27,6 @@ def get_all_runs() -> list:
     runs = list()
 
     for result in results:
-
         dto = RunDTO(
             category=result[0],
             speedrun_username=result[1],
@@ -49,18 +53,18 @@ def get_runner_from_name(speedrun_username: str) -> RunnerDTO:
     result = c.fetchone()
 
     return RunnerDTO(
-            discord_id=result[0],
-            speedrun_username=result[1],
-            speedrun_id=result[2],
-            rank_overall=result[3],
-            rank_inbounds=result[4],
-            rank_oob=result[5],
-            rank_glitchless=result[6],
-            points_overall=result[7],
-            points_inbounds=result[8],
-            points_oob=result[9],
-            points_glitchless=result[10]
-        )
+        discord_id=result[0],
+        speedrun_username=result[1],
+        speedrun_id=result[2],
+        rank_overall=result[3],
+        rank_inbounds=result[4],
+        rank_oob=result[5],
+        rank_glitchless=result[6],
+        points_overall=result[7],
+        points_inbounds=result[8],
+        points_oob=result[9],
+        points_glitchless=result[10]
+    )
 
 
 def get_runner_from_discord_id(discord_id: int) -> RunnerDTO:
@@ -117,18 +121,18 @@ def get_run_from_player(player: str, category: str, level: str) -> RunDTO:
     result = c.fetchone()
 
     return RunDTO(
-            category=result[0],
-            speedrun_username=result[1],
-            speedrun_id=result[2],
-            level=result[3],
-            weblink=result[4],
-            video=result[5],
-            demos=result[6],
-            place=result[7],
-            points=result[8],
-            time=result[9],
-            date=result[10]
-        )
+        category=result[0],
+        speedrun_username=result[1],
+        speedrun_id=result[2],
+        level=result[3],
+        weblink=result[4],
+        video=result[5],
+        demos=result[6],
+        place=result[7],
+        points=result[8],
+        time=result[9],
+        date=result[10]
+    )
 
 
 def get_all_runners() -> list:
@@ -139,7 +143,6 @@ def get_all_runners() -> list:
     runners = list()
 
     for result in results:
-
         dto = RunnerDTO(
             discord_id=result[0],
             speedrun_username=result[1],
@@ -159,7 +162,27 @@ def get_all_runners() -> list:
     return runners
 
 
-def add_discord_id_to_runner(discord_id: int, speedrun_username: str):
+def add_or_update_discord_id_of_runner(speedrun_username: str, discord_id: int):
 
     c = get_connection().cursor()
-    c.execute(f'update runners set discord_id={discord_id} where speedrun_username="{speedrun_username}"')
+    c.execute(f'select speedrun_username, discord_id from runners where discord_id=%d' % discord_id)
+    result = c.fetchall()
+
+    # If query returns nothing, this username has not been registered, yet
+    # Therefore we will add the discord_id to that runner
+    if len(result) == 0:
+        c.execute(f'update runners set discord_id=%d where speedrun_username="%s"' % (discord_id, speedrun_username))
+        get_connection().commit()
+        return
+
+    # In case a user has already connected their account
+    # Fetch their old username
+    c.execute('select speedrun_username from runners where discord_id=%d' % discord_id)
+    old_username = c.fetchone()
+
+    # Set discord_id to 0 for the old user, effectively disconnecting it
+    c.execute('update runners set discord_id=0 where speedrun_username="%s"' % old_username)
+
+    # Update discord_id for new username
+    c.execute('update runners set discord_id=%d where speedrun_username="%s"' % (discord_id, speedrun_username))
+    get_connection().commit()

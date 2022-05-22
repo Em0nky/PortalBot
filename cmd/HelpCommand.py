@@ -48,10 +48,10 @@ class HelpCommand(commands.Cog):
                 embed.add_field(name='!leaderboard [category] [level] [filter=?]',
                                 value='Displays a level leaderboard with filtered output.\n'
                                       '> Example: `!leaderboard oob 14 filter=place>1`\n'
-                                      'Possible filters: `place, time (ms), points`',
+                                      '> Common filters: `place, time (in ms), points`',
                                 inline=False)
 
-            if args[1].lower() == 'profile' or args[1].lower() == 'pf':
+            elif args[1].lower() == 'profile' or args[1].lower() == 'pf':
 
                 embed.title = 'Help: !profile Command'
                 embed.description = 'Aliases: `!pf`'
@@ -62,14 +62,14 @@ class HelpCommand(commands.Cog):
                                 value='Display [player]\'s profile.',
                                 inline=False)
 
-            if args[1].lower() == 'run':
+            elif args[1].lower() == 'run':
 
                 embed.title = 'Help: !run Command'
                 embed.add_field(name='!run [player] [category] [chamber]',
                                 value='Display [player]\'s run of [chamber] in [category] ',
                                 inline=False)
 
-            if args[1].lower() == 'recent':
+            elif args[1].lower() == 'recent':
 
                 embed.title = 'Help: !recent Command'
                 embed.add_field(name='!recent',
@@ -81,14 +81,14 @@ class HelpCommand(commands.Cog):
                                 value='Display a list of [player]\'s 10 most recent ILs in specified category.',
                                 inline=False)
 
-            if args[1].lower() == 'convert':
+            elif args[1].lower() == 'convert':
 
                 embed.title = 'Help: !convert Command'
                 embed.add_field(name='!convert [time/ticks]',
                                 value='Convert ticks or time to their respective format.',
                                 inline=False)
 
-            if args[1].lower() == 'connect':
+            elif args[1].lower() == 'connect':
 
                 embed.title = 'Help: !connect Command'
                 embed.add_field(name='!connect',
@@ -97,6 +97,18 @@ class HelpCommand(commands.Cog):
                 embed.add_field(name='!connect [username]',
                                 value='Connect speedrun.com username to bot.',
                                 inline=False)
+
+            elif args[1].lower() == 'compare':
+
+                embed.title = 'Help: !compare Command'
+                embed.add_field(name='!compare [runners...]',
+                                value='Compare leaderboard stats of up to 6 runners.',
+                                inline=False)
+
+            else:
+
+                await ctx.send(f'Help for command {args[1]} was not found.')
+                return
 
         await ctx.send(embed=embed)
 

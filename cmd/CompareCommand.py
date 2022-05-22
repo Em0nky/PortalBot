@@ -10,16 +10,31 @@ class CompareCommand(commands.Cog):
 
     @commands.command()
     async def compare(self, ctx):
+
         args = ctx.message.content.split(' ')
 
         if len(args) < 2:
-            await ctx.send()
+            await ctx.send('You need to specify at least 2 runners to compare.')
+            return
+
+        if len(args) > 7:
+            await ctx.send('You can only compare up to 6 runners.')
             return
 
         embed = discord.Embed()
-        runners = [DatabaseUtils.get_runner_from_name(args[1]), DatabaseUtils.get_runner_from_name(args[2])]
+        runners = list()
 
-        embed.title = f'Comparing {runners[0].speedrun_username} and {runners[1].speedrun_username}'
+        # Put specified runners into a runner list
+        for r in args[1:]:
+
+            try:
+                user = DatabaseUtils.get_runner_from_name(r)
+                runners.append(user)
+            except TypeError:
+                await ctx.send(f'{r} does not seem to have any individual level runs.')
+                return
+
+        embed.title = f'Comparing {len(runners)} runners'
         embed.__setattr__('color', 0x00ffff)
 
         for r in runners:

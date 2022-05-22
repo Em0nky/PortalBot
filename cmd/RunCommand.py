@@ -47,9 +47,10 @@ class RunCommand(commands.Cog):
             run_links += f' | [Video]({run.video})'
 
         if run.demos is not None:
-            run_links += f' | [Demos]({run.demos})'
+            run_links += f' | [Demo]({run.demos})'
 
-        embed.title = f'{run.level}: {run.category} run by {run.speedrun_username}'
+        embed.title = f'{run.level}: {run.category.replace("_", " ")} run by {run.speedrun_username}'
+        embed.set_thumbnail(url=f'https://www.speedrun.com/userasset/{run.speedrun_id}/image?v=3d18eec')
         embed.description = f'[ {run_links} ]'
         embed.__setattr__('color', 0x00ffff)
         place = '%d%s' % (run.place, {1: 'st', 2: 'nd', 3: 'rd'}.get(run.place if run.place < 20 else run.place % 10, 'th'))

@@ -33,24 +33,25 @@ def export_image_leaderboard(sort_value=BoardSortValue.points_overall, sort_asce
     # Cut dataframe to board length
     df = df.head(board_length)
 
-    # Change header symbol accordingly
-    header_mod = '🔼' if sort_ascending else '🔽'
-
-    # No header symbol if sorting is default
-    header_mod = '' if (sort_value is BoardSortValue.points_overall and sort_ascending is False) else header_mod
-
     header_values = ['Place', 'Player', 'Overall', 'Glitchless', 'Inbounds', 'OoB']
 
+    # !!! REMOVED THIS BECAUSE IT LOOKS UGLY !!! I NEED TO FIND A BETTER SOLUTION ONE DAY !!!
+
+    # Change header symbol accordingly
+    # header_mod = '🔼' if sort_ascending else '🔽'
+    # No header symbol if sorting is default
+    # header_mod = '' if (sort_value is BoardSortValue.points_overall and sort_ascending is False) else header_mod
+
     # Add header symbol accordingly
-    match sort_value:
-        case BoardSortValue.points_overall:
-            header_values[2] = 'Overall' + header_mod
-        case BoardSortValue.points_glitchless:
-            header_values[3] = 'Glitchless' + header_mod
-        case BoardSortValue.points_inbounds:
-            header_values[4] = 'Inbounds' + header_mod
-        case BoardSortValue.points_oob:
-            header_values[5] = 'OoB' + header_mod
+    # match sort_value:
+    #     case BoardSortValue.points_overall:
+    #         header_values[2] = 'Overall' + header_mod
+    #     case BoardSortValue.points_glitchless:
+    #         header_values[3] = 'Glitch...' + header_mod
+    #     case BoardSortValue.points_inbounds:
+    #         header_values[4] = 'Inbounds' + header_mod
+    #     case BoardSortValue.points_oob:
+    #         header_values[5] = 'OoB' + header_mod
 
     # Generate table from dataframe using plotly
     fig = pgo.Figure(data=[pgo.Table(

@@ -17,9 +17,9 @@ class ProfileCommand(commands.Cog):
 
         if len(args) == 1:
 
-            connected_runner = DatabaseUtils.get_runner_from_discord_id(ctx.author.id)
-
-            if connected_runner is None:
+            try:
+                connected_runner = DatabaseUtils.get_runner_from_discord_id(ctx.author.id)
+            except TypeError:
                 await ctx.send('You don\'t have an account connected. Connect using `!connect [username]`\n'
                                'To view someone else\'s profile, please use `!pf [username]`')
                 return
@@ -27,6 +27,7 @@ class ProfileCommand(commands.Cog):
             ImageUtils.export_image_profile(connected_runner.speedrun_username)
             embed.title = f'{connected_runner.speedrun_username if connected_runner.speedrun_username.endswith("s") else connected_runner.speedrun_username + "s"} Profile:'
             embed.description = f'Overall Rank: **{connected_runner.rank_overall}** | Overall Points: **{connected_runner.points_overall}** | Average Points: **{connected_runner.avg_points()}**'
+            embed.set_thumbnail(url=f'https://www.speedrun.com/userasset/{connected_runner.speedrun_id}/image?v=3d18eec')
 
             if connected_runner.points_oob != 0:
                 embed.add_field(name='**Out of Bounds:**',
@@ -55,8 +56,10 @@ class ProfileCommand(commands.Cog):
                 await ctx.send(f'Runner with username `{args[1]}` not found.')
                 return
 
+
             ImageUtils.export_image_profile(player.speedrun_username)
-            embed.title = f'{player.speedrun_username if player.speedrun_username.endswith("s") else player.speedrun_username + "s"} Profile:'
+            embed.title = f'Profile from {player.speedrun_username}:'
+            embed.set_thumbnail(url=f'https://www.speedrun.com/userasset/{player.speedrun_id}/image?v=3d18eec')
 
             if player.points_oob != 0:
                 embed.add_field(name='**Out of Bounds:**',
