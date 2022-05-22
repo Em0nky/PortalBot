@@ -1,69 +1,40 @@
-from DBHelper import DBHelper
-import discord
+import os
 import warnings
-from commands import HelpCommand, RunCommand, LeaderboardCommand, LevelboardCommand, ProfileCommand, RecentCommand, \
-    ConvertCommand
+from discord.ext import commands
+from discord.ext.commands import CommandNotFound
 
-# PortalBot V0.3.3
-
-# Points Pre-Setup
-dbHelper = DBHelper()
-client = discord.Client()
+client = commands.Bot(command_prefix='!', help_command=None)
 
 # Suppress FutureWarning in console from pandas
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+# Suppress SQLAlchemy related UserWarning in console from pandas
+warnings.simplefilter(action='ignore', category=UserWarning)
+
 
 @client.event
 async def on_ready():
-    print('Successfully logged in as {0.user}'.format(client))
+    print(f'Successfully logged in as {client.user}')
 
 
+# Process commands when a message was sent
 @client.event
 async def on_message(message):
+    await client.process_commands(message)
 
-    # If message is from bot, don't do anything
-    if message.author == client.user:
+
+# Don't show command not found error in log
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
         return
+    raise error
 
-    command = message.content.split(" ")[0].lower()
-    args = message.content.split(" ")[1:]
 
-    if message.content.startswith('!'):
-        print(f'{message.author} executed command {message.content}')
+# Load all commands as extensions for discord.py
+for filename in os.listdir('./cmd'):
+    if filename.endswith('.py') and filename != '__init__.py':
+        client.load_extension(f'cmd.{filename[:-3]}')
+        print(f'Loaded cmd.{filename[:-3]}')
 
-    if command.startswith('!help'):
-        await HelpCommand.on_command(message, args)
-        return
-
-    # Run Command
-    if command.startswith('!run'):
-        await RunCommand.on_command(message, args)
-        return
-
-    # General Points Leaderboard Commands
-    if command.startswith('!leaderboard') or command.startswith('!lb'):
-        await LeaderboardCommand.on_command(message, args)
-        return
-
-    # Chamber Points Leaderboard Commands
-    if command.startswith('!levelboard') or command.startswith('!lvlb'):
-        await LevelboardCommand.on_command(message, args)
-        return
-
-    # Profile Commands
-    if command.startswith('!profile') or command.startswith('!pf'):
-        await ProfileCommand.on_command(message, args)
-        return
-
-    # Recent Command
-    if command.startswith('!recent'):
-        await RecentCommand.on_command(message, args)
-        return
-
-    # Convert Command
-    if command.startswith('!convert'):
-        await ConvertCommand.on_command(message, args)
-        return
-
-client.run(open("botToken.txt", "r").read())
+client.run(open('token.txt', 'r').read())

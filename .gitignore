@@ -1,5 +1,5 @@
-botToken.txt
-PointsDB.db
-runList.csv
-userList.csv
+token.txt
 list.png
+/venv/
+DBDataGrab.py
+DBUpdate.py
